@@ -360,6 +360,41 @@
     .wahl .fuss{ display:none; }
     .wahl .fuss.handy{ display:block; }
   }
+
+  /* ===== Szene als Bild sichern (Export) ================================= */
+  .expblock{ width:100%; max-width:760px; margin:20px auto 0;
+             border-top:1px solid rgba(255,255,255,.14); padding-top:18px; text-align:left; }
+  .expblock .titel{ font-size:14px; font-weight:600; margin-bottom:10px; opacity:.92; }
+  .expreihe{ display:flex; flex-wrap:wrap; gap:8px; }
+  .expbtn{ font:inherit; font-size:14px; padding:9px 14px; border-radius:9px; cursor:pointer;
+           border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.07);
+           color:inherit; }
+  .expbtn:hover{ background:rgba(255,255,255,.15); }
+  .expblock .info{ font-size:12.5px; opacity:.6; line-height:1.55; margin-top:10px; }
+  #expLade{ position:fixed; inset:0; z-index:140; display:none;
+            align-items:center; justify-content:center; background:rgba(8,10,14,.85);
+            color:#e8eaee; font-size:15px;
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  body.explaeuft #expLade{ display:flex; }
+  #expBox{ position:fixed; inset:0; z-index:150; display:none; overflow-y:auto;
+           -webkit-overflow-scrolling:touch; background:rgba(8,10,14,.96);
+           padding:calc(env(safe-area-inset-top) + 18px) 16px calc(env(safe-area-inset-bottom) + 24px); }
+  body.expoffen #expBox{ display:block; }
+  #expBox .innen{ max-width:520px; margin:0 auto; color:#e8eaee; text-align:center;
+                  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  #expBox h2{ font-size:17px; margin:0 0 4px; }
+  #expBox .masse{ color:#9aa1ad; font-size:13px; margin:0 0 14px; line-height:1.5;
+                  word-break:break-all; }
+  #expVorschau{ display:block; width:100%; max-width:230px; margin:0 auto 14px;
+                border-radius:10px; border:1px solid #2a2f3a; background:#000; }
+  #expBox .tipp{ border-left:3px solid #4a5060; padding:2px 0 2px 13px; text-align:left;
+                 color:#9aa1ad; font-size:13.5px; line-height:1.5; margin:0 0 16px; }
+  #expBox .tipp b{ color:#e8eaee; }
+  #expBox .reihe{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  #expBox .knopf{ font:inherit; font-size:15px; padding:11px 18px; border-radius:10px;
+                  border:1px solid #3a4150; background:#20242e; color:#e8eaee;
+                  cursor:pointer; text-decoration:none; }
+  #expBox .knopf.fertig{ background:#2f6b8f; border-color:#2f6b8f; }
 </style>
 </head>
 <body>
@@ -620,6 +655,22 @@
       Bilder bleiben nach einem Neuladen erhalten, Videos müssen erneut gewählt werden.
       &middot; <span id="dateienloeschen" class="loeschen">Auswahl zurücksetzen</span>
     </div>
+  </div>
+
+  <div class="expblock">
+    <div class="titel">Szene als Bild sichern</div>
+    <div class="expreihe">
+      <button class="expbtn" data-exp="6821">6821<small style="opacity:.6"> · PK Büro</small></button>
+      <button class="expbtn" data-exp="6832">6832<small style="opacity:.6"> · PK Büro</small></button>
+      <button class="expbtn" data-exp="6834">6834<small style="opacity:.6"> · Redaktion</small></button>
+      <button class="expbtn" data-exp="6904">6904<small style="opacity:.6"> · Livestream</small></button>
+      <button class="expbtn" data-exp="6917">6917<small style="opacity:.6"> · Meme</small></button>
+    </div>
+    <div class="info">Das Bild wird so breit wie der Bildschirm dieses Gerätes und so lang,
+      wie die Seite es verlangt. Für Hoch- oder Querformat das Gerät vorher drehen.
+      Selbst geladene Fotos und Videos sind im Bild enthalten; Dateien, die nur aus dem
+      Ordner neben der HTML-Datei kommen, nur dann, wenn die Seite über eine Webadresse
+      geöffnet ist.</div>
   </div>
 
   <div class="fuss">
@@ -1169,5 +1220,372 @@ document.addEventListener("keydown", e => {
 szeneOeffnen(SZENE);
 if(!WUNSCH) wahlZeigen();
 </script>
+
+<!-- ======================= EXPORT: Anzeige ======================= -->
+<div id="expLade">Bild wird erzeugt &hellip;</div>
+
+<div id="expBox">
+  <div class="innen">
+    <h2>Bild erzeugt</h2>
+    <p class="masse" id="expMasse"></p>
+    <img id="expVorschau" alt="">
+    <p class="tipp" id="expTipp"></p>
+    <div class="reihe">
+      <button class="knopf fertig" id="expTeilen">Sichern</button>
+      <a class="knopf" id="expLaden" download>Herunterladen</a>
+      <button class="knopf" id="expZu">Schlie&szlig;en</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================================
+   SZENE ALS BILD SICHERN
+   ----------------------------------------------------------------------------
+   Erzeugt aus einer Szene ein einzelnes PNG:
+       Breite = Bildschirmbreite des benutzten Geraetes (in echten Pixeln),
+       Hoehe  = so lang, wie die Seite es verlangt (gesamter Scrollbereich).
+   Hoch- und Querformat werden getrennt behandelt: die Breitenangaben der
+   Seite (@media) werden vor dem Zeichnen fuer genau diese Breite und
+   Ausrichtung aufgeloest, damit das Bild aussieht wie der Bildschirm.
+
+   Ablauf:
+     1. gewuenschte Szene anwenden (unsichtbar, die Auswahl liegt darueber)
+     2. Stylesheet der Seite einsammeln, @media aufloesen, auf .szexp begrenzen
+     3. Kopie der Seite in voller Laenge unsichtbar aufbauen und messen
+     4. Videos durch ihr aktuelles Standbild, Bilder durch Datenadressen ersetzen
+     5. alles in ein SVG mit foreignObject legen, auf Leinwand zeichnen, PNG
+   ========================================================================== */
+(function(){
+
+  var ZIEL  = ".app";     /* Knoten, der abgebildet wird              */
+  var NAME  = "StadtZeitung";     /* Anfang des Dateinamens                   */
+  var EXTRA = "\n.szexp{ box-sizing:border-box; margin:0; padding:0; height:auto !important;\n        min-height:0 !important; max-height:none !important; overflow:visible !important;\n        display:block !important; }\n.szexp *{ animation:none !important; transition:none !important; }\n\n.szexp .app{ height:auto !important; min-height:0 !important; overflow:visible !important; }\n.szexp .scroll{ overflow:visible !important; height:auto !important; max-height:none !important;\n                flex:0 0 auto !important; }\n.szexp .browserbar{ position:static !important; }\n.szexp .sokopf{ position:static !important; }\n.szexp .vollbild{ display:none !important; }\n";      /* Zusatzregeln, nur fuer den Export        */
+
+  var MAXKANTE = 12000, MAXPIXEL = 16000000;   /* Grenzen der Leinwand */
+
+  var blob = null, dateiname = "";
+
+  /* --- Masse des Geraetebildschirms ------------------------------------- */
+  function masse(){
+    var dpr  = window.devicePixelRatio || 1;
+    var kurz = Math.min(screen.width, screen.height);
+    var lang = Math.max(screen.width, screen.height);
+    var quer = window.innerWidth > window.innerHeight;   /* iOS dreht screen.* nicht mit */
+    return { breite: quer ? lang : kurz, hoehe: quer ? kurz : lang, dpr: dpr, quer: quer };
+  }
+
+  /* --- Stylesheet aufbereiten ------------------------------------------- */
+  function passend(t, start){
+    var tiefe = 0;
+    for(var j = start; j < t.length; j++){
+      var c = t.charAt(j);
+      if(c === "{") tiefe++;
+      else if(c === "}"){ tiefe--; if(tiefe === 0) return j; }
+    }
+    return t.length - 1;
+  }
+
+  function medienTest(frage, B, H, quer){
+    var oder = frage.split(",");
+    for(var i = 0; i < oder.length; i++){
+      var teile = oder[i].split(/\band\b/), alle = true;
+      for(var j = 0; j < teile.length; j++){
+        var t = teile[j].trim().replace(/^\(/, "").replace(/\)$/, "").trim();
+        if(!t) continue;
+        var p = t.split(":"), k = p[0].trim().toLowerCase(), v = (p[1] || "").trim().toLowerCase();
+        if(k === "max-width")       alle = alle && (B <= parseFloat(v));
+        else if(k === "min-width")  alle = alle && (B >= parseFloat(v));
+        else if(k === "max-height") alle = alle && (H <= parseFloat(v));
+        else if(k === "min-height") alle = alle && (H >= parseFloat(v));
+        else if(k === "orientation")alle = alle && (v === (quer ? "landscape" : "portrait"));
+        else if(k === "screen" || k === "all" || t === "screen" || t === "all"){ /* passt */ }
+      }
+      if(alle) return true;
+    }
+    return false;
+  }
+
+  /* body / html / :root werden zum Wurzelknoten der Kopie, alles andere
+     bekommt .szexp davor - so wirkt das Stylesheet nur in der Kopie.      */
+  function waehlerUmbauen(kopf){
+    var teile = kopf.split(","), neu = [];
+    for(var i = 0; i < teile.length; i++){
+      var s = teile[i].trim();
+      if(!s) continue;
+      if(s === "html" || s === "body" || s === ":root"){ neu.push(".szexp"); continue; }
+      s = (" " + s)
+            .replace(/([^-\w.#\[]):root(?![-\w])/g, "$1\u0001")
+            .replace(/([^-\w.#\[])body(?![-\w])/g,  "$1\u0001")
+            .replace(/([^-\w.#\[])html(?![-\w])/g,  "$1\u0001")
+            .replace(/\u0001/g, ".szexp").trim();
+      if(s.indexOf(".szexp") !== 0) s = ".szexp " + s;
+      neu.push(s);
+    }
+    return neu.join(",");
+  }
+
+  function bearbeiten(css, B, H, quer){
+    var aus = "", i = 0;
+    while(i < css.length){
+      var auf = css.indexOf("{", i);
+      if(auf < 0) break;
+      var kopf = css.slice(i, auf).trim();
+      var zu   = passend(css, auf);
+      var rumpf = css.slice(auf + 1, zu);
+      if(kopf.charAt(0) === "@"){
+        var art = kopf.slice(1).split(/[\s({]/)[0].toLowerCase();
+        if(art === "media"){
+          if(medienTest(kopf.slice(kopf.indexOf("media") + 5), B, H, quer))
+            aus += bearbeiten(rumpf, B, H, quer);
+        } else if(art === "supports"){
+          aus += bearbeiten(rumpf, B, H, quer);
+        } else {
+          aus += kopf + "{" + rumpf + "}";        /* @keyframes bleibt, wie es ist */
+        }
+      } else {
+        aus += waehlerUmbauen(kopf) + "{" + rumpf + "}";
+      }
+      i = zu + 1;
+    }
+    return aus;
+  }
+
+  function cssSammeln(B, H, quer){
+    var roh = "", stile = document.querySelectorAll("style");
+    for(var i = 0; i < stile.length; i++) roh += stile[i].textContent + "\n";
+    roh = roh.replace(/\/\*[\s\S]*?\*\//g, "");
+    return bearbeiten(roh, B, H, quer) + "\n" + EXTRA;
+  }
+
+  /* --- Kopie der Seite --------------------------------------------------- */
+  function klonBauen(B){
+    var wrap = document.createElement("div");
+    var klassen = [];
+    for(var i = 0; i < document.body.classList.length; i++){
+      var c = document.body.classList[i];
+      if(c !== "waehlen" && c !== "expoffen" && c !== "explaeuft") klassen.push(c);
+    }
+    wrap.className = "szexp " + klassen.join(" ");
+    var cs = getComputedStyle(document.body);
+    var hg = cs.backgroundColor;
+    if(!hg || hg === "transparent" || hg === "rgba(0, 0, 0, 0)") hg = "#ffffff";
+    wrap.setAttribute("style",
+      "width:" + B + "px; margin:0; padding:0; position:relative; overflow:visible;" +
+      "background:" + hg + "; color:" + cs.color + "; font-family:" + cs.fontFamily + ";");
+
+    var quelle = document.querySelector(ZIEL);
+    var kopie  = quelle.cloneNode(true);
+    wrap.appendChild(kopie);
+
+    /* Eingefelder: der getippte Text steckt in der Eigenschaft, nicht im Attribut */
+    var eA = quelle.querySelectorAll("input, textarea");
+    var eB = kopie.querySelectorAll("input, textarea");
+    for(var j = 0; j < eB.length; j++){
+      if(eB[j].tagName === "TEXTAREA") eB[j].textContent = eA[j] ? eA[j].value : "";
+      else eB[j].setAttribute("value", eA[j] ? eA[j].value : "");
+    }
+    return { wrap: wrap, hg: hg };
+  }
+
+  /* --- Videos und Bilder einbetten -------------------------------------- */
+  function medienEinbetten(klon, fertig){
+    var echt   = document.querySelectorAll(ZIEL + " video");
+    var kopien = klon.querySelectorAll("video");
+    for(var i = 0; i < kopien.length; i++){
+      var v = echt[i], k = kopien[i], d = null;
+      try{
+        if(v && v.videoWidth){
+          var c = document.createElement("canvas");
+          c.width = v.videoWidth; c.height = v.videoHeight;
+          c.getContext("2d").drawImage(v, 0, 0);
+          d = c.toDataURL("image/jpeg", 0.9);
+        }
+      }catch(e){ d = null; }
+      if(d){
+        var b = document.createElement("img");
+        b.setAttribute("src", d);
+        b.className = k.className;
+        var vs = getComputedStyle(v);
+        b.setAttribute("style", "display:block; width:" + vs.width + "; height:" + vs.height +
+          "; object-fit:" + (vs.objectFit || "cover") + "; border-radius:" + vs.borderRadius + ";");
+        k.parentNode.replaceChild(b, k);
+      } else if(k.parentNode){
+        k.parentNode.removeChild(k);      /* dahinter liegt der Greenscreen */
+      }
+    }
+
+    var bilder = klon.querySelectorAll("img"), offen = bilder.length;
+    if(!offen){ fertig(); return; }
+    var ab = function(){ if(--offen === 0) fertig(); };
+    for(var n = 0; n < bilder.length; n++){
+      (function(b){
+        var src = b.getAttribute("src") || "";
+        if(!src || src.indexOf("data:") === 0){ ab(); return; }
+        var q = new Image();
+        q.onload = function(){
+          try{
+            var c = document.createElement("canvas");
+            c.width = q.naturalWidth; c.height = q.naturalHeight;
+            c.getContext("2d").drawImage(q, 0, 0);
+            var gross = q.naturalWidth * q.naturalHeight > 400000;
+            b.setAttribute("src", c.toDataURL(gross ? "image/jpeg" : "image/png", 0.9));
+          }catch(e){ b.removeAttribute("src"); }   /* aus dem Ordner geladen, aber ohne
+                                                      Webadresse nicht kopierbar        */
+          ab();
+        };
+        q.onerror = function(){ b.removeAttribute("src"); ab(); };
+        q.src = src;
+      })(bilder[n]);
+    }
+  }
+
+  /* --- Hauptablauf ------------------------------------------------------- */
+  function erzeugen(nr){
+    var vorher = SZENE;
+    document.body.classList.add("explaeuft");
+    szeneAnwenden(nr);
+
+    setTimeout(function(){
+      var m   = masse(), B = m.breite;
+      var css = cssSammeln(B, m.hoehe, m.quer);
+      var g   = klonBauen(B);
+      var klon = g.wrap;
+
+      var buehne = document.createElement("div");
+      buehne.setAttribute("style",
+        "position:fixed; left:-30000px; top:0; width:" + B + "px; z-index:-1;" +
+        "pointer-events:none; opacity:0;");
+      var stil = document.createElement("style");
+      stil.textContent = css;
+      buehne.appendChild(stil);
+      buehne.appendChild(klon);
+      document.body.appendChild(buehne);
+
+      var aufraeumen = function(){
+        if(buehne.parentNode) buehne.parentNode.removeChild(buehne);
+        szeneAnwenden(vorher);
+        document.body.classList.remove("explaeuft");
+      };
+
+      medienEinbetten(klon, function(){
+        var hoeheCss = Math.ceil(klon.getBoundingClientRect().height);
+        if(!hoeheCss){ aufraeumen(); alert("Das Bild konnte nicht erzeugt werden."); return; }
+
+        var k = m.dpr;
+        var W = Math.round(B * k), H = Math.round(hoeheCss * k);
+        var f = Math.min(1, MAXKANTE / W, MAXKANTE / H, Math.sqrt(MAXPIXEL / (W * H)));
+        if(f < 1){ k = k * f; W = Math.round(B * k); H = Math.round(hoeheCss * k); }
+
+        var inhalt;
+        try{
+          klon.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+          inhalt = new XMLSerializer().serializeToString(klon);
+        }catch(e){ aufraeumen(); alert("Das Bild konnte nicht erzeugt werden."); return; }
+
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H +
+                  '" viewBox="0 0 ' + W + ' ' + H + '">' +
+                  '<rect width="100%" height="100%" fill="' + g.hg + '"/>' +
+                  '<foreignObject x="0" y="0" width="' + W + '" height="' + H + '">' +
+                  '<div xmlns="http://www.w3.org/1999/xhtml" style="transform:scale(' + k +
+                  ');transform-origin:0 0;width:' + B + 'px;height:' + hoeheCss + 'px;">' +
+                  '<style><![CDATA[' + css + ']]></style>' + inhalt +
+                  '</div></foreignObject></svg>';
+
+        var img = new Image();
+        img.onload = function(){
+          var c = document.createElement("canvas");
+          c.width = W; c.height = H;
+          var ctx = c.getContext("2d");
+          ctx.fillStyle = g.hg; ctx.fillRect(0, 0, W, H);
+          ctx.drawImage(img, 0, 0, W, H);
+          dateiname = (NAME + "_" + nr + "_" + W + "x" + H + ".png").replace(/[^A-Za-z0-9_.-]/g, "");
+          var uebergeben = function(b){
+            blob = b;
+            var url = URL.createObjectURL(b);
+            document.getElementById("expVorschau").src = url;
+            var a = document.getElementById("expLaden");
+            a.href = url; a.setAttribute("download", dateiname);
+            document.getElementById("expMasse").textContent =
+              W + " × " + H + " px · " + Math.round(b.size / 1024) + " KB · " + dateiname;
+            tippSetzen();
+            aufraeumen();
+            document.body.classList.add("expoffen");
+          };
+          if(c.toBlob) c.toBlob(uebergeben, "image/png");
+          else {
+            var d = c.toDataURL("image/png");
+            var bin = atob(d.split(",")[1]), arr = new Uint8Array(bin.length);
+            for(var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+            uebergeben(new Blob([arr], { type: "image/png" }));
+          }
+        };
+        img.onerror = function(){
+          aufraeumen();
+          alert("Das Bild konnte nicht erzeugt werden.");
+        };
+        img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+      });
+    }, 90);
+  }
+
+  /* --- Sichern ----------------------------------------------------------- */
+  function teilenMoeglich(){
+    try{
+      if(!navigator.canShare || !blob) return false;
+      return navigator.canShare({ files: [new File([blob], dateiname, { type: "image/png" })] });
+    }catch(e){ return false; }
+  }
+
+  function tippSetzen(){
+    var apple = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    var t = document.getElementById("expTipp");
+    document.getElementById("expLaden").style.display  = "";
+    document.getElementById("expTeilen").style.display = "";
+    if(apple){
+      t.innerHTML = 'Auf <b>Sichern</b> tippen und im Men&uuml; <b>&bdquo;Bild sichern&ldquo;</b> w&auml;hlen. ' +
+                    'Klappt das nicht, das Vorschaubild <b>gedr&uuml;ckt halten</b> &rarr; ' +
+                    '<b>&bdquo;Zu Fotos hinzuf&uuml;gen&ldquo;</b>.';
+      document.getElementById("expLaden").style.display = "none";
+    } else {
+      t.innerHTML = '&Uuml;ber <b>Herunterladen</b> als PNG sichern. Das Bild ist so breit wie ' +
+                    'der Bildschirm dieses Ger&auml;tes und so lang, wie die Seite es verlangt.';
+      document.getElementById("expTeilen").style.display = teilenMoeglich() ? "" : "none";
+    }
+  }
+
+  function sichern(){
+    if(!blob) return;
+    if(teilenMoeglich()){
+      navigator.share({ files: [new File([blob], dateiname, { type: "image/png" })] })
+        .catch(function(){ /* abgebrochen - egal */ });
+    } else {
+      document.getElementById("expLaden").click();
+    }
+  }
+
+  function zu(){
+    document.body.classList.remove("expoffen");
+    var v = document.getElementById("expVorschau");
+    if(v.src.indexOf("blob:") === 0) URL.revokeObjectURL(v.src);
+  }
+
+  document.addEventListener("click", function(e){
+    var b = e.target.closest ? e.target.closest(".expbtn") : null;
+    if(!b) return;
+    e.preventDefault(); e.stopPropagation();
+    erzeugen(b.getAttribute("data-exp"));
+  }, true);
+
+  document.getElementById("expTeilen").addEventListener("click", sichern);
+  document.getElementById("expZu").addEventListener("click", zu);
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && document.body.classList.contains("expoffen")) zu();
+  });
+
+})();
+</script>
+
 </body>
 </html>

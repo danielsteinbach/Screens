@@ -9,11 +9,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Screens">
 <meta name="theme-color" content="#00b140">
-<title>Screens V1.01</title>
+<title>Screens V2.0</title>
 <!--
 ================================================================================
-  SCREENS V1.01  –  Green / Blue / Grey mit Trackingpoints
-  Datei: Screens_v1.01.html
+  SCREENS V2.0  –  Green / Blue / Grey mit Trackingpoints
+  Datei: Screens_v2.html
   Universeller Zuspieler-Ersatz fuer jedes Geraet und jedes Seitenverhaeltnis.
   Eine Datei, rein lokal, kein Internet noetig.
 
@@ -38,9 +38,11 @@
     Wischen ueber den Bildschirm aendert nichts – nur ein Wisch vom aeussersten
     Rand bleibt dem System ueberlassen (Zurueck-Geste).
 
-  Version: Screens V1.01
-    Neu gegenueber V1.0: eigene Farbe fuer die Eckmarken waehlbar,
-    damit sie sich vom Rahmen des jeweiligen Monitors abheben.
+  Version: Screens V2.0
+    Neu gegenueber V1.01: "Als Bild sichern" – erzeugt den eingestellten
+    Screen als PNG in voller Geraeteaufloesung. Am iPhone der Weg zu einem
+    echten Vollbild: Bild in die Fotos-App sichern und dort anzeigen.
+    V1.01 brachte die eigene Farbe fuer die Eckmarken.
 
   Urheberschaft und Copyright: Daniel Steinbach
     Telefon  +43 664 421 70 82
@@ -184,6 +186,30 @@
   #danke .gross{ font-size:34px; font-weight:700; letter-spacing:.5px; }
   #danke .klein{ font-size:15px; color:#8b93a3; }
   .tipp{ color:#8b93a3; font-size:12.5px; line-height:1.6; margin-top:14px; text-align:center; }
+
+/* ===== Als Bild sichern ================================================== */
+#bildbox{ position:fixed; inset:0; z-index:60; display:none;
+          background:rgba(8,10,14,.94); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+          overflow-y:auto; -webkit-overflow-scrolling:touch;
+          padding:calc(env(safe-area-inset-top) + 18px) 16px calc(env(safe-area-inset-bottom) + 24px); }
+body.bildoffen #bildbox{ display:block; }
+#bildbox .innen{ max-width:520px; margin:0 auto; color:#e8eaee;
+                 font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+#bildbox h2{ font-size:17px; margin:0 0 4px; }
+#bildbox .masse{ color:#9aa1ad; font-size:13.5px; margin:0 0 14px;
+                 font-variant-numeric:tabular-nums; }
+#bildvorschau{ display:block; width:100%; max-width:260px; margin:0 auto 14px;
+               border-radius:10px; border:1px solid #2a2f3a; background:#000; }
+#bildbox .hinweis{ border-left:3px solid #4a5060; padding:2px 0 2px 13px;
+                   color:#9aa1ad; font-size:13.5px; line-height:1.5; margin:0 0 16px; }
+#bildbox .hinweis b{ color:#e8eaee; }
+#bildbox .knopfreihe{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+#bildbox .knopfreihe .knopf{ text-decoration:none; }
+#bildlade{ position:fixed; inset:0; z-index:61; display:none;
+           align-items:center; justify-content:center; background:rgba(8,10,14,.8);
+           color:#e8eaee; font-size:15px;
+           font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+body.bildlaeuft #bildlade{ display:flex; }
 </style>
 </head>
 <body>
@@ -205,7 +231,7 @@
      das Skript nicht durchlaeuft. Die Regel dafuer steht im <noscript>. -->
 <div id="anleitung">
   <div class="karte">
-    <h2>Screens V1.01 läuft hier nur eingeschränkt</h2>
+    <h2>Screens V2.0 läuft hier nur eingeschränkt</h2>
     <p class="einl">Diese Vorschau zeigt nur das Grundbild. Für Farbwahl, Trackingpoints
        und Menü die Datei bitte <b>im Browser</b> öffnen – das geht auch ohne Internet.</p>
 
@@ -237,7 +263,7 @@
     </div>
 
     <p class="fuss">Kein Internet nötig – die Datei läuft vollständig auf dem Gerät.<br>
-       Screens V1.01 &middot; Daniel Steinbach &middot; +43 664 421 70 82 &middot;
+       Screens V2.0 &middot; Daniel Steinbach &middot; +43 664 421 70 82 &middot;
        danielsteinbach@gmx.net</p>
     <button class="knopf fertig" id="anleitungzu">Verstanden</button>
   </div>
@@ -253,7 +279,7 @@
 <div id="erststart">
   <div class="karte">
     <h2>Screens</h2>
-    <p class="ver">Version V1.01 &middot; Green / Blue / Grey mit Trackingpoints</p>
+    <p class="ver">Version V2.0 &middot; Green / Blue / Grey mit Trackingpoints</p>
 
     <div class="zeile"><div class="wort">Menü</div>
       <div class="txt">Dreimal kurz hintereinander tippen oder klicken.
@@ -278,7 +304,7 @@
 
 <div id="impressum">
   <div class="box">
-    <h2>Screens V1.01 &middot; Info</h2>
+    <h2>Screens V2.0 &middot; Info</h2>
     <p class="bier">🍺</p>
     <p>Urheberschaft und Copyright liegen bei <b>Daniel Steinbach</b>.</p>
     <p>Jede Verwertung und Nutzung ist frei – verwenden, weitergeben, verändern,
@@ -287,7 +313,7 @@
        eine <b>Flasche Bier</b> als Dankeschön.</p>
     <p>Kontakt<br><span class="tel">+43 664 421 70 82</span><br>
        <span class="mail">danielsteinbach@gmx.net</span></p>
-    <p style="color:#8b93a3;font-size:13.5px">Screens V1.01</p>
+    <p style="color:#8b93a3;font-size:13.5px">Screens V2.0</p>
     <div class="fussreihe">
       <button class="knopf fertig" id="impressumzu">Schließen</button>
     </div>
@@ -296,12 +322,12 @@
 
 <div id="danke">
   <div class="gross">Danke Daniel!</div>
-  <div class="klein" id="dankeklein">Screens V1.01 wird beendet …</div>
+  <div class="klein" id="dankeklein">Screens V2.0 wird beendet …</div>
 </div>
 
 <div id="menue">
   <div class="box">
-    <h1>Screens <span style="color:#8b93a3;font-weight:400">V1.01</span></h1>
+    <h1>Screens <span style="color:#8b93a3;font-weight:400">V2.0</span></h1>
     <p class="unter">Green / Blue / Grey mit Trackingpoints &middot; passt sich jedem Bildschirm an</p>
 
     <div class="gruppe">
@@ -359,6 +385,7 @@
 
     <div class="fussreihe">
       <button class="knopf" id="vollbild">Vollbild</button>
+      <button class="knopf" id="bildmachen">Als Bild sichern</button>
       <button class="knopf" id="zuruecksetzen">Zurücksetzen</button>
       <button class="knopf" id="infoknopf">Info</button>
       <button class="knopf" id="beenden">Beenden</button>
@@ -585,12 +612,13 @@ function raster(W, H, anzahl){
   return beste;
 }
 
-function zeichnen(){
-  const W = Math.round(window.innerWidth), H = Math.round(window.innerHeight);
+/* Baut den kompletten Bildinhalt fuer eine beliebige Groesse.
+   Frueher steckte das direkt in zeichnen(); ausgelagert, damit die
+   Funktion "Als Bild sichern" exakt dasselbe in Geraeteaufloesung
+   erzeugen kann - eine Quelle, kein zweiter Zeichencode.            */
+function svgInhalt(W, H){
   const farbe = aktuelleFarbe();
   const mf = markenFarbe();
-  document.body.style.background = farbe.css;
-  document.body.classList.toggle("hellerText", farbe.hell < 110);
 
   let inhalt = '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="'+farbe.css+'"/>';
 
@@ -633,10 +661,19 @@ function zeichnen(){
     inhalt += eckmarke(W-h, H-h, -1, -1, l, d, ef);
   }
 
+  return inhalt;
+}
+
+function zeichnen(){
+  const W = Math.round(window.innerWidth), H = Math.round(window.innerHeight);
+  const farbe = aktuelleFarbe();
+  document.body.style.background = farbe.css;
+  document.body.classList.toggle("hellerText", farbe.hell < 110);
+
   flaeche.setAttribute("viewBox", "0 0 " + W + " " + H);
   flaeche.setAttribute("width", W);
   flaeche.setAttribute("height", H);
-  flaeche.innerHTML = inhalt;
+  flaeche.innerHTML = svgInhalt(W, H);
 
   /* Infozeile */
   const dpr = window.devicePixelRatio || 1;
@@ -893,6 +930,160 @@ zeichnen();
    Der erste Klick blendet den Hinweis aus und erlaubt zugleich das Vollbild. */
 if(ERSTSTART) document.body.classList.add("erststart");
 if(E.wach) wachSetzen(true);
+</script>
+
+<div id="bildlade">Bild wird erzeugt …</div>
+
+<div id="bildbox">
+  <div class="innen">
+    <h2>Bild erzeugt</h2>
+    <p class="masse" id="bildmasse"></p>
+    <img id="bildvorschau" alt="">
+    <p class="hinweis" id="bildtipp"></p>
+    <div class="knopfreihe">
+      <button class="knopf fertig" id="bildteilen">Sichern</button>
+      <a class="knopf" id="bildladen" download>Herunterladen</a>
+      <button class="knopf" id="bildzu">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+/* ============================================================================
+   ALS BILD SICHERN
+   Erzeugt den eingestellten Screen als PNG in voller Geraeteaufloesung.
+   Gedacht fuer Geraete, auf denen die Seite selbst nicht in den Vollbildmodus
+   kann - am iPhone etwa. Das Bild wandert in die Fotos-App und laeuft dort
+   nach einem Antippen wirklich formatfuellend, ohne Uhr und ohne Leisten.
+
+   Gezeichnet wird mit svgInhalt() - also exakt derselbe Code wie am
+   Bildschirm, nur in Pixelmassen statt in Punkten.
+   ========================================================================== */
+(function(){
+
+  var blob = null, dateiname = "";
+
+  function pixelmasse(){
+    var dpr  = window.devicePixelRatio || 1;
+    var kurz = Math.min(screen.width, screen.height);
+    var lang = Math.max(screen.width, screen.height);
+    var quer = window.innerWidth > window.innerHeight;   /* iOS dreht screen.* nicht mit */
+    var Wpt  = quer ? lang : kurz;
+    var Hpt  = quer ? kurz : lang;
+    return { W: Math.round(Wpt * dpr), H: Math.round(Hpt * dpr), dpr: dpr };
+  }
+
+  function namenBauen(W, H){
+    var FORMEN = {1:"Kreuz", 2:"Fadenkreuz", 3:"Punkt", 4:"X", 5:"Schachfeld"};
+    var teile = ["Screen"];
+    teile.push(E.farbe === "eigen" ? "eigen" + E.eigen.replace("#","") : E.farbe);
+    if(E.hell !== 100) teile.push("hell" + E.hell);
+    teile.push(E.menge + "x" + (FORMEN[E.form] || E.form));
+    teile.push(E.marke);
+    if(E.groesse !== 100) teile.push("gr" + E.groesse);
+    if(E.ecken) teile.push("Eckmarken" + (E.eckfarbe && E.eckfarbe !== "auto" ? "-" + E.eckfarbe : ""));
+    if(E.mitte) teile.push("Mitte");
+    teile.push(W + "x" + H);
+    return teile.join("_").replace(/[^A-Za-z0-9_.-]/g, "") + ".png";
+  }
+
+  function erzeugen(){
+    var m = pixelmasse(), W = m.W, H = m.H;
+    document.body.classList.add("bildlaeuft");
+
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H +
+              '" viewBox="0 0 ' + W + ' ' + H + '">' + svgInhalt(W, H) + '</svg>';
+
+    var img = new Image();
+    img.onload = function(){
+      var c = document.createElement("canvas");
+      c.width = W; c.height = H;
+      var ctx = c.getContext("2d");
+      ctx.drawImage(img, 0, 0, W, H);
+      dateiname = namenBauen(W, H);
+
+      var fertig = function(b){
+        blob = b;
+        var url = URL.createObjectURL(b);
+        document.getElementById("bildvorschau").src = url;
+        var a = document.getElementById("bildladen");
+        a.href = url; a.setAttribute("download", dateiname);
+        document.getElementById("bildmasse").textContent =
+          W + " × " + H + " px · " + Math.round(b.size/1024) + " KB · " + dateiname;
+        hinweisSetzen();
+        document.body.classList.remove("bildlaeuft");
+        document.body.classList.add("bildoffen");
+      };
+
+      if(c.toBlob){ c.toBlob(fertig, "image/png"); }
+      else {
+        /* sehr alte Browser: Umweg ueber die Datenadresse */
+        var d = c.toDataURL("image/png");
+        var bin = atob(d.split(",")[1]), arr = new Uint8Array(bin.length);
+        for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+        fertig(new Blob([arr], {type:"image/png"}));
+      }
+    };
+    img.onerror = function(){
+      document.body.classList.remove("bildlaeuft");
+      alert("Das Bild konnte nicht erzeugt werden.");
+    };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+
+  function teilenMoeglich(){
+    try {
+      if(!navigator.canShare || !blob) return false;
+      return navigator.canShare({ files: [new File([blob], dateiname, {type:"image/png"})] });
+    } catch(e){ return false; }
+  }
+
+  function hinweisSetzen(){
+    var apple = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    var t = document.getElementById("bildtipp");
+    if(apple){
+      t.innerHTML = 'Auf <b>Sichern</b> tippen und im Menü <b>„Bild sichern“</b> wählen. ' +
+                    'Klappt das nicht, das Vorschaubild <b>gedrückt halten</b> → <b>„Zu Fotos hinzufügen“</b>.<br><br>' +
+                    'Danach in der <b>Fotos</b>-App öffnen und einmal antippen – das ist echtes Vollbild, ' +
+                    'ohne Uhr und ohne Leisten.';
+      document.getElementById("bildladen").style.display = "none";
+    } else {
+      t.innerHTML = 'Über <b>Herunterladen</b> als PNG speichern. ' +
+                    'Das Bild hat exakt die Auflösung dieses Bildschirms.';
+      document.getElementById("bildteilen").style.display = teilenMoeglich() ? "" : "none";
+    }
+  }
+
+  function sichern(){
+    if(!blob) return;
+    if(teilenMoeglich()){
+      var f = new File([blob], dateiname, {type:"image/png"});
+      navigator.share({ files: [f] }).catch(function(){ /* abgebrochen - egal */ });
+    } else {
+      document.getElementById("bildladen").click();
+    }
+  }
+
+  function zu(){
+    document.body.classList.remove("bildoffen");
+    var v = document.getElementById("bildvorschau");
+    if(v.src.indexOf("blob:") === 0) URL.revokeObjectURL(v.src);
+  }
+
+  document.getElementById("bildmachen").addEventListener("click", function(){
+    menueAuf(false);
+    setTimeout(erzeugen, 60);          /* Menue erst schliessen, dann zeichnen */
+  });
+  document.getElementById("bildteilen").addEventListener("click", sichern);
+  document.getElementById("bildzu").addEventListener("click", zu);
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && document.body.classList.contains("bildoffen")) zu();
+  });
+
+})();
+
 </script>
 </body>
 </html>

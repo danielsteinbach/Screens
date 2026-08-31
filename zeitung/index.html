@@ -24,6 +24,8 @@
     6834  Redaktion, Specht       wie 6832
     6904  Wirtshaus, Tablet       Livestream der Live-Show, Bild laeuft
     6917  Handy, Yara             Meme-Post auf der Social-Media-Seite
+    6922  Tablet, Joe             Aufzeichnung der Show aus der Mediathek,
+                                  anhaltbar wie ein normaler Player
   Direktaufruf auch ueber  ?state=early | late | live | viral
   Tasten 1-5 = Szene, 0 = zurueck zur Auswahl
 
@@ -173,7 +175,16 @@
   body.state-live #kommentare,
   body.state-live .blaettern,
   body.state-live .trenner{ display:none; }
+
+  /* 6922 – wie der Livestream aufgebaut, aber ohne LIVE-Kennzeichen */
+  body.state-archiv .komkopf,
+  body.state-archiv #kommentare,
+  body.state-archiv .blaettern,
+  body.state-archiv .trenner{ display:none; }
   body.state-live .playknopf span{ display:none; }
+  /* 6922: kein Abspielsymbol in der Bildmitte. Die Flaeche bleibt tippbar,
+     Anhalten und Weiterspielen funktionieren also weiterhin. */
+  body.state-archiv .playknopf span{ display:none; }
   .tonhinweis{
     position:absolute; bottom:52px; left:50%; transform:translateX(-50%); z-index:4;
     background:rgba(0,0,0,.7); color:#fff; font-size:14px; padding:8px 16px; border-radius:20px;
@@ -599,6 +610,11 @@
       <div class="nr">6917</div><div class="ort">Handy — Yara</div>
       <div class="txt">Meme-Post auf der Social-Media-Seite, mit Klickzahlen.</div>
     </button>
+    <button class="karte" data-sz="6922">
+      <div class="nr">6922</div><div class="ort">Tablet — Joe</div>
+      <div class="txt">Aufzeichnung der Show aus der Mediathek. Läuft nicht live,
+        lässt sich anhalten.</div>
+    </button>
   </div>
 
   <div class="laden">
@@ -665,6 +681,7 @@
       <button class="expbtn" data-exp="6834">6834<small style="opacity:.6"> · Redaktion</small></button>
       <button class="expbtn" data-exp="6904">6904<small style="opacity:.6"> · Livestream</small></button>
       <button class="expbtn" data-exp="6917">6917<small style="opacity:.6"> · Meme</small></button>
+      <button class="expbtn" data-exp="6922">6922<small style="opacity:.6"> · Mediathek</small></button>
     </div>
     <div class="info">Das Bild wird so breit wie der Bildschirm dieses Gerätes und so lang,
       wie die Seite es verlangt. Für Hoch- oder Querformat das Gerät vorher drehen.
@@ -692,9 +709,10 @@ const SZENEN = {
   "6832": { state:"late",  url:"stadtzeitung-online.at/podcast/linzbeinacht/aktuellefolge.html" },
   "6834": { state:"late",  url:"stadtzeitung-online.at/podcast/linzbeinacht/aktuellefolge.html" },
   "6904": { state:"live",  url:"stadtzeitung-online.at/live/linzbeinacht-liveshow.html" },
-  "6917": { state:"viral", url:"pixl.com/stadtzeitung.linz" }
+  "6917": { state:"viral", url:"pixl.com/stadtzeitung.linz" },
+  "6922": { state:"archiv", url:"stadtzeitung-online.at/mediathek/linzbeinacht-grosseshow.html" }
 };
-const STATE_ZU_SZENE = { early:"6821", late:"6832", live:"6904", viral:"6917" };
+const STATE_ZU_SZENE = { early:"6821", late:"6832", live:"6904", viral:"6917", archiv:"6922" };
 
 const PARAM  = new URLSearchParams(location.search);
 const WUNSCH = SZENEN[PARAM.get("szene")] ? PARAM.get("szene")
@@ -933,7 +951,7 @@ function medienSetzen(){
     dateiSuchen(k, url => { el.src = url; });
   });
   /* Video passend zur Szene */
-  const k = (S.state === "live") ? "live" : "podcast", m = MEDIEN[k];
+  const k = (S.state === "live" || S.state === "archiv") ? "live" : "podcast", m = MEDIEN[k];
   platz.src = greenscreen(m.w, m.h, m.label);
   film.removeAttribute("src"); film.load();
   film.style.display = "none";
@@ -965,7 +983,7 @@ function pfeilePruefen(){
 function szeneAnwenden(nr){
   if(!SZENEN[nr]) return;
   SZENE = nr; S = SZENEN[nr];
-  ["state-early","state-late","state-live","state-viral","laeuft","stumm","videovoll"]
+  ["state-early","state-late","state-live","state-archiv","state-viral","laeuft","stumm","videovoll"]
     .forEach(c => document.body.classList.remove(c));
   document.body.classList.add("state-" + S.state);
 
@@ -973,19 +991,36 @@ function szeneAnwenden(nr){
 
   if(S.state === "live"){
     document.getElementById("titel").textContent = "LIVE: Linz bei Nacht – Die große Live-Show";
-    document.getElementById("folge").textContent = "Live aus dem Posthof";
+    document.getElementById("folge").textContent = "Live aus dem Studio";
     document.getElementById("breadcrumb").innerHTML =
       "STARTSEITE &gt; PODCAST &gt; LINZ BEI NACHT &gt; Live-Show";
     document.getElementById("teaser").innerHTML =
       "Zwei Stunden Bühne, ein Fall, der die Stadt bewegt hat. Patrizia Specht spricht mit " +
       "Adrian Kracher und dem Beamten, der am Sendemast alles verändert hat.<br>" +
-      "<b>Jetzt live aus dem Posthof Linz.</b>";
+      "<b>Jetzt live aus dem Studio.</b>";
     zeitan.textContent = "LIVE";
     fort.style.width = "100%";
     document.getElementById("servicelinks").innerHTML =
-      'Zur Live-Show im Posthof: <a href="#">stadtzeitung-online.at/live/tickets</a><br>' +
+      'Zur Live-Show im Studio: <a href="#">stadtzeitung-online.at/live/tickets</a><br>' +
       'Alle bisherigen Folgen streamen: <a href="#">stadtzeitung-online.at/podcast/linzbeinacht/stream</a><br>' +
       'Live mitreden im Chat: <a href="#">stadtzeitung-online.at/live/chat</a>';
+  } else if(S.state === "archiv"){
+    /* 6922 – Aufzeichnung der Show in der Mediathek. Aufbau wie 6904,
+       aber ohne LIVE-Kennzeichen: normale Spielzeit, normaler Abspielknopf. */
+    document.getElementById("titel").textContent = "Mediathek: Linz bei Nacht – Die große Show";
+    document.getElementById("folge").textContent = "Aufzeichnung der Show";
+    document.getElementById("breadcrumb").innerHTML =
+      "STARTSEITE &gt; PODCAST &gt; LINZ BEI NACHT &gt; Mediathek";
+    document.getElementById("teaser").innerHTML =
+      "Der Abend, der alles veränderte: Sendemast, Sprengstoff und ein Beamter, der mit " +
+      "seinem Leben dazwischen ging.<br>" +
+      "<b>Das Live-Event zum Nachschauen.</b>";
+    zeitan.textContent = "0:00 / 1:52:18";
+    fort.style.width = "0%";
+    document.getElementById("servicelinks").innerHTML =
+      'Alle Aufzeichnungen in der Mediathek: <a href="#">stadtzeitung-online.at/mediathek</a><br>' +
+      'Audioversion dieser Show downloaden: <a href="#">stadtzeitung-online.at/mediathek/audio</a><br>' +
+      'Alle “LINZ BEI NACHT” folgen streamen: <a href="#">stadtzeitung-online.at/podcast/linzbeinacht/stream</a>';
   } else {
     document.getElementById("titel").textContent = "LINZ BEI NACHT – True Crime Stahlstadt";
     document.getElementById("folge").textContent = "aktuelle Folge";
@@ -1020,7 +1055,7 @@ document.addEventListener("click", e => {
   document.body.classList.remove("waehlen");
 });
 
-const TASTEN = { "1":"6821", "2":"6832", "3":"6834", "4":"6904", "5":"6917" };
+const TASTEN = { "1":"6821", "2":"6832", "3":"6834", "4":"6904", "5":"6917", "6":"6922" };
 document.addEventListener("keydown", e => {
   if(e.target.tagName === "INPUT") return;
   if(TASTEN[e.key]){ szeneOeffnen(TASTEN[e.key]); document.body.classList.remove("waehlen"); }

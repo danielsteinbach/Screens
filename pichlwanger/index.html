@@ -1894,12 +1894,32 @@ const MZW_GRUSS = "\u2014 MZW \u2014 Mut zur Wahrheit";
 let GRUSS_AN = false;
 try { GRUSS_AN = localStorage.getItem("mzw_gruss") === "1"; } catch(e){ /* egal */ }
 
+function kurzformWeg(t){ return String(t).replace(/\s*[-\u2013\u2014]\s*MZW\s*$/, ""); }
+
 function mzwKoerper(m, istMZW){
-  let t = m.t || "";
+  const t = m.t || "";
   if(!istMZW || !GRUSS_AN) return esc(t);
-  t = t.replace(/\s*[-\u2013\u2014]\s*MZW\s*$/, "");
-  return esc(t) + '<span class="mzwgruss">' + esc(MZW_GRUSS) + '</span>';
+  return esc(kurzformWeg(t)) + '<span class="mzwgruss">' + esc(MZW_GRUSS) + '</span>';
 }
+
+/* In Szene 6835 tippt der Darsteller den Satz selbst - dort haengt der Gruss
+   hinten an, weil ein Eingabefeld keine zweite Zeile kann.                  */
+const ENTWURF_ORIG = {};
+Object.keys(SZENEN).forEach(k => { ENTWURF_ORIG[k] = SZENEN[k].entwurf || ""; });
+
+function entwuerfeSetzen(){
+  Object.keys(SZENEN).forEach(k => {
+    const o = ENTWURF_ORIG[k];
+    if(!o){ SZENEN[k].entwurf = o; return; }
+    SZENEN[k].entwurf = (SZENEN[k].ich === "MutZurWahrheit" && GRUSS_AN)
+      ? kurzformWeg(o) + " " + MZW_GRUSS : o;
+  });
+  const feld = document.getElementById("input");
+  if(feld && S && typeof S.entwurf === "string"){
+    feld.value = S.entwurf.slice(0, Math.min(feld.value.length, S.entwurf.length));
+  }
+}
+entwuerfeSetzen();
 
 window.mzwGrussStatus = function(){ return GRUSS_AN; };
 window.mzwGrussSetzen = function(an){
@@ -1907,6 +1927,7 @@ window.mzwGrussSetzen = function(an){
   try { localStorage.setItem("mzw_gruss", GRUSS_AN ? "1" : "0"); } catch(e){ /* egal */ }
   const box = document.getElementById("grussSchalter");
   if(box) box.checked = GRUSS_AN;
+  entwuerfeSetzen();
   verlaufBauen();
 };
 

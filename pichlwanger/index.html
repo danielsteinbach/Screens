@@ -518,6 +518,14 @@
     .chatladen .ring{ animation:none; border-top-color:#2b2d52; }
   }
 
+  /* ---------------- Gruss-Variante von MutZurWahrheit ----------------
+     Eigene Zeile unter dem Nachrichtentext, gleiche Schrift wie der Text.  */
+  #bildschirm-chat .bubble .body .mzwgruss{ display:block; margin-top:10px; }
+
+  /* Schalter in der Szenenauswahl */
+  .einst-zeile label{ display:flex; align-items:center; gap:8px; cursor:pointer; }
+  .einst-zeile input[type=checkbox]{ width:auto; accent-color:#4ad9a5; cursor:pointer; }
+
 
   /* ============ Eingebettete Chatgruppe (Daniel) ============ */
 #bildschirm-chat{
@@ -1131,6 +1139,11 @@
       Ladezeit der Chatgruppe:
       <input type="number" id="chatVerzoegerung" min="0" step="0.5" value="3"> Sekunden
     </div>
+    <div class="einst-zeile">
+      <label><input type="checkbox" id="grussSchalter">
+        MutZurWahrheit unterschreibt jede Nachricht mit „— MZW — Mut zur Wahrheit“
+        <span style="color:#6f749b">(Taste <kbd>G</kbd>)</span></label>
+    </div>
   </div>
 
   <div class="laden">
@@ -1214,6 +1227,7 @@
 
   <div class="fuss">
     Szene öffnen mit <kbd>1</kbd> (Zeitung) / <kbd>2</kbd> (Mail) / <kbd>3</kbd> (Chat), zurück zu dieser Auswahl mit <kbd>0</kbd><br>
+    Gruß von MutZurWahrheit ein- und ausschalten mit <kbd>G</kbd><br>
     Vollbild mit <kbd>F11</kbd> (PC) bzw. <kbd>cmd ctrl F</kbd> (Mac)
   </div>
   <div class="fuss handy">
@@ -1278,6 +1292,26 @@ document.addEventListener("click", e => {
   szeneOeffnen(k.getAttribute("data-sz"));
   document.body.classList.remove("waehlen");
 });
+
+/* Gruss-Variante: Haekchen in der Auswahl und Taste G.
+   In Szenen mit aktivem Eingabefeld tippt die Taste einen Buchstaben –
+   dort schaltet G nur, solange die Auswahl offen ist.                        */
+(function(){
+  const box = document.getElementById("grussSchalter");
+  if(box) box.addEventListener("change", () => {
+    if(typeof window.mzwGrussSetzen === "function") window.mzwGrussSetzen(box.checked);
+  });
+  document.addEventListener("keydown", e => {
+    if(e.key !== "g" && e.key !== "G") return;
+    if(e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+    if(document.body.classList.contains("eingabe") &&
+       !document.body.classList.contains("waehlen") &&
+       !document.body.classList.contains("chatwaehlen")) return;
+    if(typeof window.mzwGrussSetzen === "function"){
+      window.mzwGrussSetzen(!window.mzwGrussStatus());
+    }
+  });
+})();
 
 const TASTEN = { "1":"6849T1", "2":"6851T1", "3":"chat" };
 document.addEventListener("keydown", e => {
@@ -1851,6 +1885,31 @@ const CHAT = [
 const msgs = document.getElementById("messages");
 const esc  = s => s.replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
+/* ----------------------------------------------------------------------------
+   Gruss-Variante: MutZurWahrheit unterschreibt jede eigene Nachricht.
+   Zwei Nachrichten enden schon auf " - MZW"; diese Kurzform wird ersetzt,
+   damit alle Nachrichten gleich enden.
+   -------------------------------------------------------------------------- */
+const MZW_GRUSS = "\u2014 MZW \u2014 Mut zur Wahrheit";
+let GRUSS_AN = false;
+try { GRUSS_AN = localStorage.getItem("mzw_gruss") === "1"; } catch(e){ /* egal */ }
+
+function mzwKoerper(m, istMZW){
+  let t = m.t || "";
+  if(!istMZW || !GRUSS_AN) return esc(t);
+  t = t.replace(/\s*[-\u2013\u2014]\s*MZW\s*$/, "");
+  return esc(t) + '<span class="mzwgruss">' + esc(MZW_GRUSS) + '</span>';
+}
+
+window.mzwGrussStatus = function(){ return GRUSS_AN; };
+window.mzwGrussSetzen = function(an){
+  GRUSS_AN = !!an;
+  try { localStorage.setItem("mzw_gruss", GRUSS_AN ? "1" : "0"); } catch(e){ /* egal */ }
+  const box = document.getElementById("grussSchalter");
+  if(box) box.checked = GRUSS_AN;
+  verlaufBauen();
+};
+
 function verlaufBauen(){
   let tag = "Heute", html = "";
   CHAT.forEach(m => {
@@ -1871,7 +1930,7 @@ function verlaufBauen(){
         <div class="bubble${m.breit ? " breit" : ""}">
           <div class="from" style="color:${p.nc}">${esc(m.u)}</div>
           ${foto}
-          <div class="body">${esc(m.t)}</div>
+          <div class="body">${mzwKoerper(m, istMZW)}</div>
           ${reakt}
           <div class="zeit">${m.zt ? esc(m.zt) : m.z + " &middot; " + tag}</div>
         </div>
@@ -1895,6 +1954,12 @@ function verlaufBauen(){
     msgs.querySelectorAll(".mzw-av").forEach(el => el.innerHTML = '<img src="' + url + '" alt="">');
   });
 }
+
+/* Schalter beim Start auf den gemerkten Stand bringen */
+(function(){
+  const box = document.getElementById("grussSchalter");
+  if(box) box.checked = GRUSS_AN;
+})();
 
 /* Mitgliederliste – von der Szene unabhaengig, wird einmal gebaut */
 const ALLE = Object.entries(U).concat(WEITERE);

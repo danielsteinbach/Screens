@@ -542,6 +542,11 @@
       <img class="vorschau" alt="">
     </div>
 
+        <div class="grusszeile">
+      <input type="checkbox" id="grussSchalter">
+      <label for="grussSchalter">MutZurWahrheit unterschreibt jede Nachricht mit
+        „— MZW — Mut zur Wahrheit“ (Taste <kbd>G</kbd>)</label>
+    </div>
     <div class="hinweis">Die Zuordnung erfolgt über die Zeile, nicht über den Dateinamen –
       Android benennt Fotos beim Auswählen oft um.<br>
       Gewählte Fotos bleiben auch nach einem Neuladen erhalten &middot;
@@ -759,6 +764,78 @@ const CHAT = [
 const msgs = document.getElementById("messages");
 const esc  = s => s.replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
+/* ============================================================================
+   GRUSS-VARIANTE von MutZurWahrheit
+   Mit eingeschalteter Variante endet jede MZW-Nachricht auf einer eigenen
+   Zeile mit "— MZW — Mut zur Wahrheit". Zwei Nachrichten enden schon auf
+   " - MZW"; diese Kurzform wird ersetzt, damit alle gleich enden.
+   Geschaltet wird ueber das Haekchen in der Szenenauswahl oder mit Taste G.
+   ========================================================================== */
+const MZW_GRUSS = "\u2014 MZW \u2014 Mut zur Wahrheit";
+let GRUSS_AN = false;
+try { GRUSS_AN = localStorage.getItem("mzw_gruss") === "1"; } catch(e){ /* egal */ }
+
+const ENTWURF_ORIG = {};
+Object.keys(SZENEN).forEach(function(k){ ENTWURF_ORIG[k] = SZENEN[k].entwurf || ""; });
+
+function kurzformWeg(t){ return String(t).replace(/\s*[-\u2013\u2014]\s*MZW\s*$/, ""); }
+
+function mzwKoerper(m, istMZW){
+  var t = m.t || "";
+  if(!istMZW || !GRUSS_AN) return esc(t);
+  return esc(kurzformWeg(t)) + '<span class="mzwgruss">' + esc(MZW_GRUSS) + '</span>';
+}
+
+/* In Szene 6835 tippt der Darsteller den Satz selbst – dort haengt der Gruss
+   hinten an, weil ein Eingabefeld keine zweite Zeile kann.                  */
+function entwuerfeSetzen(){
+  Object.keys(SZENEN).forEach(function(k){
+    var o = ENTWURF_ORIG[k];
+    if(!o){ SZENEN[k].entwurf = o; return; }
+    SZENEN[k].entwurf = (SZENEN[k].ich === "MutZurWahrheit" && GRUSS_AN)
+      ? kurzformWeg(o) + " " + MZW_GRUSS : o;
+  });
+  var feld = document.getElementById("input");
+  if(feld && S && typeof S.entwurf === "string"){
+    feld.value = S.entwurf.slice(0, Math.min(feld.value.length, S.entwurf.length));
+  }
+}
+
+window.mzwGrussStatus = function(){ return GRUSS_AN; };
+window.mzwGrussSetzen = function(an){
+  GRUSS_AN = !!an;
+  try { localStorage.setItem("mzw_gruss", GRUSS_AN ? "1" : "0"); } catch(e){ /* egal */ }
+  var box = document.getElementById("grussSchalter");
+  if(box) box.checked = GRUSS_AN;
+  entwuerfeSetzen();
+  verlaufBauen();
+};
+
+(function(){
+  var st = document.createElement("style");
+  st.textContent = ".bubble .body .mzwgruss{display:block;margin-top:10px}"
+    + ".laden .grusszeile{display:flex;align-items:flex-start;gap:9px;margin-top:14px;"
+    + "font-size:13.5px;color:#9aa0bd;line-height:1.55;text-align:left}"
+    + ".laden .grusszeile input{accent-color:#4ad9a5;cursor:pointer;flex:none;margin-top:3px}"
+    + ".laden .grusszeile label{cursor:pointer}";
+  document.head.appendChild(st);
+
+  var box = document.getElementById("grussSchalter");
+  if(box){
+    box.checked = GRUSS_AN;
+    box.addEventListener("change", function(){ window.mzwGrussSetzen(box.checked); });
+  }
+  /* Taste G. In Szenen mit Eingabefeld tippt der Darsteller – dort schaltet G
+     nur, solange die Szenenauswahl offen ist.                                */
+  document.addEventListener("keydown", function(e){
+    if(e.key !== "g" && e.key !== "G") return;
+    if((e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")
+       && !document.body.classList.contains("chatwaehlen")) return;
+    window.mzwGrussSetzen(!GRUSS_AN);
+  });
+  entwuerfeSetzen();
+})();
+
 function verlaufBauen(){
   let tag = "Heute", html = "";
   CHAT.forEach(m => {
@@ -779,7 +856,7 @@ function verlaufBauen(){
         <div class="bubble${m.breit ? " breit" : ""}">
           <div class="from" style="color:${p.nc}">${esc(m.u)}</div>
           ${foto}
-          <div class="body">${esc(m.t)}</div>
+          <div class="body">${mzwKoerper(m, istMZW)}</div>
           ${reakt}
           <div class="zeit">${m.zt ? esc(m.zt) : m.z + " &middot; " + tag}</div>
         </div>

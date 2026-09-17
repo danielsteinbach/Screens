@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sichergestellter Chatverlauf</title>
+<meta name="description" content="Requisite SOKO Linz 2026, Block II – Ausdruck des Chatverlaufs fuer die Fallwand. Nur fuer den Dreh.">
+<style>
+/* ------------------------------------------------------------------
+   Ausdruck des Chatverlaufs fuer die Fallwand
+   Requisite fuer SOKO Linz 2026, Block II  --  Szenen 6931 und 6936
+   A4, schwarzweisstauglich, laeuft ohne Internet.
+   ------------------------------------------------------------------ */
+@page{ size:A4; margin:16mm 15mm 14mm 15mm; }
+:root{ --linie:#000; --eigen:#ededed; --rahmen:#555; }
+*{box-sizing:border-box}
+html,body{margin:0;background:#8a8a8a}
+body{
+  font-family:"Segoe UI",Arial,Helvetica,sans-serif;
+  font-size:10.5pt;line-height:1.35;color:#000;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.blatt{
+  width:210mm;min-height:297mm;margin:12mm auto;background:#fff;
+  padding:16mm 15mm 14mm;box-shadow:0 2mm 8mm rgba(0,0,0,.4);
+}
+.amt{
+  font-size:8.5pt;letter-spacing:.16em;text-transform:uppercase;
+  border-bottom:.6pt solid var(--linie);padding-bottom:2mm;margin-bottom:4mm;
+  display:flex;justify-content:space-between;gap:6mm;
+}
+h1{font-size:15pt;margin:0 0 1.5mm;letter-spacing:.01em}
+.kopfzeile{font-size:9.5pt;margin:0 0 4mm}
+.kopfzeile b{font-weight:600}
+table.daten{
+  width:100%;border-collapse:collapse;font-size:9.5pt;margin-bottom:5mm;
+  border-top:.6pt solid var(--linie);border-bottom:.6pt solid var(--linie);
+}
+table.daten td{padding:1.1mm 0;vertical-align:top}
+table.daten td.b{width:34mm;font-weight:600;padding-right:3mm}
+table.daten td.c{width:36mm;font-weight:600;padding:1.1mm 3mm 1.1mm 8mm}
+.hinweis{font-size:9pt;border:.6pt solid var(--rahmen);padding:2.5mm 3mm;margin-bottom:6mm}
+.hinweis b{font-weight:600}
+.abschnitt{
+  font-size:9.5pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  margin:4mm 0 2mm;padding-bottom:1mm;border-bottom:.6pt solid var(--linie);
+  break-after:avoid;page-break-after:avoid;
+}
+.abschnitt:first-of-type{margin-top:2mm}
+.tag{font-size:9pt;font-weight:600;margin:2.5mm 0 1.2mm;break-after:avoid;page-break-after:avoid}
+.zeile{display:flex;align-items:flex-start;gap:2.5mm;margin:0.8mm 0;break-inside:avoid;page-break-inside:avoid}
+.zeile.eigen{flex-direction:row-reverse}
+.kuerzel{
+  width:8mm;height:8mm;flex:0 0 auto;border:.8pt solid #000;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:8pt;font-weight:700;
+}
+.zeile.eigen .kuerzel{background:var(--eigen)}
+.blase{max-width:118mm;border:.6pt solid var(--rahmen);border-radius:2mm;padding:1.8mm 2.6mm 1.4mm;background:#fff}
+.zeile.eigen .blase{background:var(--eigen)}
+.txt{font-size:10.5pt;line-height:1.3}
+.stempel{font-size:8pt;color:#333;margin-top:.7mm}
+.zeile.eigen .stempel{text-align:right}
+.objekt{
+  font-size:9.5pt;border:.6pt dashed #666;padding:1.6mm 2.4mm;margin:.6mm 0;
+  display:flex;align-items:center;gap:2.5mm;background:#fafafa;
+}
+.objekt svg{width:4.5mm;height:4.5mm;fill:#000;flex:0 0 auto}
+.objekt i{font-style:normal;font-size:8.5pt;color:#333}
+.fuss{
+  margin-top:4mm;padding-top:1.6mm;border-top:.6pt solid var(--linie);
+  font-size:8pt;display:flex;justify-content:space-between;gap:6mm;
+}
+.unterschrift{margin-top:4mm;font-size:9pt;display:flex;gap:14mm}
+.unterschrift div{border-top:.6pt solid #000;padding-top:1.2mm;width:62mm}
+.neueseite{break-before:page;page-break-before:always;height:0;margin:0}
+.zweitkopf{margin-top:0}
+/* Am Bildschirm eine gestrichelte Linie, damit man den Umbruch sieht.
+   Beim Messen der Seitenhoehe wird sie kurz abgeschaltet. */
+@media screen{
+  body:not(.messen) .neueseite{height:14mm;border-top:1px dashed #bbb;margin-top:10mm}
+}
+.drucken{
+  position:fixed;right:14px;top:14px;z-index:9;background:#1d1d1d;color:#fff;border:0;
+  border-radius:6px;padding:10px 16px;font-size:14px;font-family:inherit;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+.drucken:hover{background:#000}
+@media print{
+  html,body{background:#fff}
+  .blatt{width:auto;min-height:0;margin:0;padding:0;box-shadow:none}
+  .drucken{display:none}
+}
+</style>
+</head>
+<body>
+<button class="drucken" onclick="window.print()">Drucken</button>
+<div class="blatt" id="blatt"></div>
+<script>
+/*__DATEN-ANFANG__*/
+/* --------------------------------------------------------------
+   Alle veraenderlichen Inhalte stehen in diesem einen Block.
+   Die Startseite "Index_Chat_bearbeiten.html" schreibt ihn neu,
+   wenn dort etwas geaendert wird. Von Hand aendern geht auch.
+   -------------------------------------------------------------- */
+const DATEN = {
+  start: "2026-03-22",                 /* Tag der ersten Nachricht */
+  tage: [0, 25, 26, 44],               /* weitere Tage als Abstand in Tagen */
+  kontakt: "Adrian Kracher",
+  status: "",                          /* leer = wird aus dem Verlauf berechnet */
+  amt: "Landeskriminalamt – Auswertung mobiler Datenträger",
+  asservat: "2026/AS-0473-11",
+  sicher: "",                          /* leer = letzter Tag + 8 Tage */
+  extrahiert: "",                      /* leer = letzter Tag + 9 Tage, 09:22 */
+  bild: "",                            /* Foto im Chat als Base64, leer = Platzhalter */
+  bildname: "IMG_2116.jpg",
+  n: [
+    {tag:0, von:"ak", zeit:"21:04", art:"text", text:"Ich denk noch an gestern Abend 🌅"},
+    {tag:0, von:"cr", zeit:"21:09", art:"text", text:"Ich auch ☺️ War schön bei dir"},
+    {tag:0, von:"ak", zeit:"21:11", art:"text", text:"Der Baum da am Ufer... wir müssen wieder hin 🌳"},
+    {tag:0, von:"cr", zeit:"21:12", art:"text", text:"Versprochen ❤️"},
+    {tag:0, von:"ak", zeit:"21:14", art:"text", text:"Schick mir noch das Foto von vorhin?"},
+    {tag:0, von:"cr", zeit:"21:16", art:"bild", text:""},
+    {tag:0, von:"ak", zeit:"21:17", art:"text", text:"Perfekt. Du bist perfekt 😘"},
+    {tag:0, von:"cr", zeit:"21:18", art:"text", text:"Hör auf 🙈❤️"},
+
+    {tag:1, von:"ak", zeit:"18:22", art:"text", text:"Wann sehen wir uns?"},
+    {tag:1, von:"cr", zeit:"19:47", art:"text", text:"Ich brauch grad etwas Abstand"},
+    {tag:1, von:"ak", zeit:"19:48", art:"text", text:"Das versteh ich nicht. Was hab ich falsch gemacht?"},
+    {tag:1, von:"cr", zeit:"20:31", art:"text", text:"Bitte ruf mich nicht mehr an"},
+    {tag:2, von:"ak", zeit:"00:12", art:"text", text:"Clara ich lieb dich. Das weißt du."},
+    {tag:2, von:"cr", zeit:"07:05", art:"text", text:"Das ändert nichts. Bitte akzeptier das."},
+    {tag:2, von:"ak", zeit:"07:09", art:"text", text:"Ich kann das nicht einfach so stehen lassen"},
+
+    {tag:3, von:"ak", zeit:"22:38", art:"text", text:"Wir müssen reden. Nur einmal noch."},
+    {tag:3, von:"cr", zeit:"22:51", art:"text", text:"Nein."},
+    {tag:3, von:"ak", zeit:"22:52", art:"text", text:"Du kannst das nicht einfach abbrechen"},
+    {tag:3, von:"cr", zeit:"23:04", art:"text", text:"Doch. Und ich bitte dich zum letzten Mal."},
+    {tag:3, von:"ak", zeit:"23:19", art:"ton", text:"0:42"},
+    {tag:3, von:"cr", zeit:"23:41", art:"text", text:"Ich habe nichts mehr zu sagen."}
+  ]
+};
+/*__DATEN-ENDE__*/
+
+/* ---------- Datumsrechnung, oesterreichische Bezeichnungen ---------- */
+const WOCHENTAG = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+const MONATSNAME = ["Jänner","Februar","März","April","Mai","Juni","Juli",
+                    "August","September","Oktober","November","Dezember"];
+
+function zwei(n){ return (n<10?"0":"") + n; }
+
+/* Der Tag der Nachricht: Beginndatum plus der Abstand dieses Tages. */
+function tagDatum(nr){
+  const ab = (DATEN.tage && DATEN.tage[nr] != null) ? DATEN.tage[nr] : 0;
+  const d = new Date(DATEN.start + "T12:00:00");
+  d.setDate(d.getDate() + ab);
+  return d;
+}
+function langesDatum(d){
+  return WOCHENTAG[d.getDay()] + ", " + d.getDate() + ". " + MONATSNAME[d.getMonth()] + " " + d.getFullYear();
+}
+function kurzDatum(d){ return zwei(d.getDate()) + "." + zwei(d.getMonth()+1) + "." + d.getFullYear(); }
+function monatJahr(d){ return MONATSNAME[d.getMonth()] + " " + d.getFullYear(); }
+
+/* letzter Tag des Verlaufs */
+function letzterTag(){
+  let g = 0;
+  DATEN.n.forEach(m => { if((DATEN.tage[m.tag]||0) > g) g = DATEN.tage[m.tag]||0; });
+  const d = new Date(DATEN.start + "T12:00:00");
+  d.setDate(d.getDate() + g);
+  return d;
+}
+function tagePlus(d, n){ const x = new Date(d.getTime()); x.setDate(x.getDate()+n); return x; }
+
+/* "zuletzt online" - wenn nichts eingetragen ist, aus der letzten
+   Nachricht von Kracher berechnet. */
+function statusZeile(){
+  if(DATEN.status) return DATEN.status;
+  let letzte = null;
+  DATEN.n.forEach(m => { if(m.von === "ak") letzte = m; });
+  if(!letzte) return "";
+  return "zuletzt online am " + kurzDatum(tagDatum(letzte.tag)) + " um " + letzte.zeit;
+}
+function sicherText(){
+  return DATEN.sicher ? DATEN.sicher : kurzDatum(tagePlus(letzterTag(), 8));
+}
+function extrahiertText(){
+  return DATEN.extrahiert ? DATEN.extrahiert : kurzDatum(tagePlus(letzterTag(), 9)) + ", 09:22 Uhr";
+}
+function zeitraumText(){
+  const tage = DATEN.n.map(m => DATEN.tage[m.tag]||0);
+  const von = tagePlus(new Date(DATEN.start+"T12:00:00"), Math.min.apply(null,tage));
+  const bis = tagePlus(new Date(DATEN.start+"T12:00:00"), Math.max.apply(null,tage));
+  return kurzDatum(von) + " – " + kurzDatum(bis);
+}
+function anzahlText(){
+  let t=0,b=0,o=0;
+  DATEN.n.forEach(m => { if(m.art==="bild") b++; else if(m.art==="ton") o++; else t++; });
+  const teile = [];
+  if(t) teile.push(t + " Text");
+  if(b) teile.push(b + " Bild");
+  if(o) teile.push(o + " Audio");
+  return DATEN.n.length + " (" + teile.join(", ") + ")";
+}
+function esc(t){
+  return String(t == null ? "" : t)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+const IKON_BILD = '<svg viewBox="0 0 24 24"><path d="M9 3h6l1.5 2H20a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h3.5L9 3zm3 4.5A4.5 4.5 0 1 0 12 16.5 4.5 4.5 0 0 0 12 7.5zm0 2A2.5 2.5 0 1 1 12 14.5 2.5 2.5 0 0 1 12 9.5z"/></svg>';
+const IKON_TON  = '<svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V22h2v-3.1A7 7 0 0 0 19 12h-2z"/></svg>';
+
+function kopf(){
+  return '<div class="amt"><span>' + esc(DATEN.amt) + '</span><span class="blattnr"></span></div>';
+}
+function fortsetzungskopf(){
+  return '<div class="fortsetzung">' +
+           '<div class="amt zweitkopf"><span>' + esc(DATEN.amt) + '</span><span class="blattnr"></span></div>' +
+           '<p class="kopfzeile">Sichergestellter Chatverlauf &middot; Asservat-Nr. <b>' + esc(DATEN.asservat) +
+           '</b> &middot; Roithamer, Clara (CR) / ' + esc(nachname(DATEN.kontakt)) + ' (AK) &middot; Fortsetzung</p>' +
+         '</div>';
+}
+
+/* "Adrian Kracher" -> "Kracher, Adrian" */
+function nachname(name){
+  const t = String(name || "").trim().split(/\s+/);
+  if(t.length < 2) return name || "";
+  return t[t.length-1] + ", " + t.slice(0, t.length-1).join(" ");
+}
+
+function aufbauen(){
+  let h = kopf();
+
+  h += '<h1>Sichergestellter Chatverlauf</h1>' +
+       '<p class="kopfzeile">Asservat-Nr. <b>' + esc(DATEN.asservat) + '</b> &nbsp;&middot;&nbsp; ' +
+       'Extrahiert am <b>' + esc(extrahiertText()) + '</b></p>';
+
+  h += '<table class="daten">' +
+       '<tr><td class="b">Datenträger</td><td>Mobiltelefon, sichergestellt am ' + esc(sicherText()) + '</td>' +
+           '<td class="c">Anwendung</td><td>Messenger, Einzelchat</td></tr>' +
+       '<tr><td class="b">Anschlussinhaberin</td><td>Roithamer, Clara &nbsp;(CR)</td>' +
+           '<td class="c">Zeitraum</td><td>' + esc(zeitraumText()) + '</td></tr>' +
+       '<tr><td class="b">Gesprächspartner</td><td>' + esc(nachname(DATEN.kontakt)) + ' &nbsp;(AK)</td>' +
+           '<td class="c">Nachrichten</td><td>' + esc(anzahlText()) + '</td></tr>' +
+       '<tr><td class="b">Auswertung durch</td><td>Fachbereich IT-Beweissicherung</td>' +
+           '<td class="c">Prüfsumme</td><td>SHA-256 geprüft, unverändert</td></tr>' +
+       '</table>';
+
+  h += '<div class="hinweis"><b>Lesehilfe:</b> Die Darstellung entspricht der Ansicht auf dem Gerät der ' +
+       'Anschlussinhaberin. Rechts (<b>CR</b>) stehen die von diesem Gerät gesendeten Nachrichten, ' +
+       'links (<b>AK</b>) die empfangenen. Zeitangaben in Ortszeit. Bild- und Tondateien sind als ' +
+       'Anlage gesondert gesichert.</div>';
+
+  let letzterM = "", letzterT = -1, nrM = 0, anlage = 0;
+  DATEN.n.forEach(m => {
+    const d  = tagDatum(m.tag);
+    const mj = monatJahr(d);
+    if(mj !== letzterM){
+      nrM++;
+      h += '<div class="abschnitt">Phase ' + nrM + ' – ' + esc(mj) + '</div>';
+      letzterM = mj; letzterT = -1;
+    }
+    if(m.tag !== letzterT){
+      h += '<div class="tag">' + esc(langesDatum(d)) + '</div>';
+      letzterT = m.tag;
+    }
+
+    const eigen = m.von === "cr";
+    const k = eigen ? "CR" : "AK";
+    let inhalt;
+    if(m.art === "bild"){
+      anlage++;
+      inhalt = '<div class="objekt">' + IKON_BILD + '<span>Bildanhang &bdquo;' + esc(DATEN.bildname) +
+               '&ldquo;<br><i>Bilddatei · Anlage ' + anlage + '</i></span></div>';
+    }else if(m.art === "ton"){
+      anlage++;
+      inhalt = '<div class="objekt">' + IKON_TON + '<span>Sprachnachricht, Dauer ' + esc(m.text || "0:42") +
+               '<br><i>Audiodatei · Anlage ' + anlage + '</i></span></div>';
+    }else{
+      inhalt = '<div class="txt">' + esc(m.text) + '</div>';
+    }
+
+    h += '<div class="zeile ' + (eigen?"eigen":"") + '">' +
+           '<div class="kuerzel">' + k + '</div>' +
+           '<div class="blase">' + inhalt +
+             '<div class="stempel">' + k + ' &middot; ' + kurzDatum(d) + ', ' + esc(m.zeit) + ' Uhr</div>' +
+           '</div></div>';
+  });
+
+  h += '<div class="unterschrift"><div>Datum, Ort</div><div>Sachbearbeiter/in</div></div>' +
+       '<div class="fuss">' +
+         '<span>Asservat ' + esc(DATEN.asservat) + ' &middot; Chatverlauf CR / AK &middot; Ausdruck vom ' +
+           esc(String(extrahiertText()).split(",")[0]) + '</span>' +
+         '<span>Nur für den Dienstgebrauch</span>' +
+       '</div>';
+
+  document.getElementById("blatt").innerHTML = h;
+  document.title = "Sichergestellter Chatverlauf – Asservat " + DATEN.asservat;
+}
+
+/* ------------------------------------------------------------------
+   Seiten einteilen.
+   Der Inhalt haengt vom Datum und von den Texten ab, also wird die
+   Hoehe gemessen und dort umgebrochen, wo ein Blatt voll ist. Jedes
+   weitere Blatt bekommt denselben Kopf, damit es allein lesbar ist.
+   Eine Ueberschrift bleibt nie allein am Seitenende stehen.
+   ------------------------------------------------------------------ */
+function seitenTeilen(){
+  const blatt = document.getElementById("blatt");
+  document.body.classList.add("messen");
+
+  /* Millimeter in Bildpunkten, einmal ausmessen. */
+  const probe = document.createElement("div");
+  probe.style.cssText = "height:100mm;position:absolute;visibility:hidden";
+  blatt.appendChild(probe);
+  const MM = probe.offsetHeight / 100;
+  probe.remove();
+
+  const SEITE = 267 * MM;          /* A4 hoch minus 16 mm oben und 14 mm unten */
+  const oben  = el => el.offsetTop - blatt.offsetTop - 16 * MM;
+
+  let grenze = SEITE, blaetter = 1, schutz = 0;
+  while(schutz++ < 30){
+    const k = [...blatt.children];
+    let treffer = -1;
+    for(let j = 0; j < k.length; j++){
+      if(k[j].classList.contains("neueseite") || k[j].classList.contains("fortsetzung")) continue;
+      if(oben(k[j]) + k[j].offsetHeight > grenze + 1){ treffer = j; break; }
+    }
+    if(treffer < 0) break;
+
+    /* Ueberschriften mitnehmen, damit sie nicht allein stehen bleiben */
+    let j = treffer;
+    while(j > 0 && (k[j-1].classList.contains("tag") || k[j-1].classList.contains("abschnitt"))) j--;
+    if(j === 0) break;
+
+    const ziel = k[j];
+    const um = document.createElement("div");
+    um.className = "neueseite";
+    blatt.insertBefore(um, ziel);
+    const fk = document.createElement("div");
+    fk.innerHTML = fortsetzungskopf();
+    blatt.insertBefore(fk.firstChild, ziel);
+
+    blaetter++;
+    grenze = oben(um) + SEITE;
+  }
+
+  blatt.querySelectorAll(".blattnr").forEach((s,i) => {
+    s.textContent = "Blatt " + (i+1) + " von " + blaetter;
+  });
+  document.body.classList.remove("messen");
+}
+
+aufbauen();
+seitenTeilen();
+</script>
+</body>
+</html>

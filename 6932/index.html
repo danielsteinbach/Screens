@@ -413,8 +413,31 @@
   .lupe-buehne{ flex:1; min-height:0; overflow:hidden; position:relative;
                 display:flex; align-items:center; justify-content:center; cursor:grab; }
   .lupe-buehne.zieht{ cursor:grabbing; }
+  .lpfeil{
+    position:absolute; top:50%; transform:translateY(-50%); z-index:6;
+    width:58px; height:58px; border:0; border-radius:50%; cursor:pointer;
+    background:rgba(255,255,255,.13); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .15s;
+  }
+  .lpfeil:hover{ background:rgba(255,255,255,.3); }
+  .lpfeil.links{ left:20px; }
+  .lpfeil.rechts{ right:20px; }
+  .lpfeil svg{ width:28px; height:28px; fill:none; stroke:#fff; stroke-width:2.2;
+               stroke-linecap:round; stroke-linejoin:round; }
+  .lzaehler{ font-size:13.5px; color:#9aa1ac; font-variant-numeric:tabular-nums; }
   .lupe-buehne img{ max-width:100%; max-height:100%; display:block;
                     transform-origin:center center; will-change:transform; }
+
+  /* ---------------- Uebergang vom Popup in die gewaehlte Ansicht ---------------- */
+  .uebergang{
+    position:fixed; z-index:95; background:#232a35; border-radius:10px;
+    box-shadow:0 12px 34px rgba(0,0,0,.45);
+    transition: left .42s cubic-bezier(.22,.85,.32,1), top .42s cubic-bezier(.22,.85,.32,1),
+                width .42s cubic-bezier(.22,.85,.32,1), height .42s cubic-bezier(.22,.85,.32,1),
+                border-radius .42s cubic-bezier(.22,.85,.32,1);
+  }
+  .uebergang.voll{ border-radius:0; }
 
   /* ================================================================
      Szenenauswahl  (aus der Screen-Library)
@@ -795,15 +818,15 @@
         <span style="opacity:.35">&#8594;</span>
         <span style="opacity:.35">&#10227;</span>
       </div>
-      <div class="urlbar">ortsbildpflege-nussdorf.at/fotodokumentation/westufer/objekt-114</div>
+      <div class="urlbar">ortsbildpflege-salzkammergut.at/fotodokumentation/attersee-ostufer/objekt-114</div>
     </div>
 
     <div class="ver-scroll">
 
       <div class="ver-kopf">
         <div class="ver-huelle">
-          <div class="vname">Verein für Ortsbildpflege Nußdorf am Attersee</div>
-          <div class="vunter">Fotodokumentation — Bauten und Gärten am Seeufer</div>
+          <div class="vname">Verein für Ortsbildpflege Salzkammergut</div>
+          <div class="vunter">Fotodokumentation — Bauten an den Seeufern</div>
         </div>
       </div>
 
@@ -821,28 +844,31 @@
 
       <div class="ver-huelle">
         <div class="ver-brot">
-          Startseite <span>&gt;</span> Fotodokumentation <span>&gt;</span> Westufer
+          Startseite <span>&gt;</span> Fotodokumentation <span>&gt;</span> Attersee, Ostufer
           <span>&gt;</span> Objekt 114: Wohnhaus mit Bootshütte
         </div>
-        <h1 class="ver-titel">Objekt 114 — Wohnhaus mit Bootshütte, Westufer</h1>
+        <h1 class="ver-titel">Objekt 114 — Wohnhaus mit Bootshütte, Attersee-Ostufer</h1>
         <div class="ver-untertitel">Erfassung im heurigen Frühjahr · Aufnahmen vom See, von der Straße und vom Grundstück</div>
 
         <div class="ver-blatt">
           <div class="ver-text">
-            <p>Das Anwesen liegt am Westufer zwischen der Landesstraße und dem See. Der gelb
-              verputzte Bau mit dem erhöhten Eckteil und die hölzerne Bootshütte am Wasser
-              bilden zusammen ein Ensemble, wie es in dieser Vollständigkeit am Attersee
-              nur noch an wenigen Stellen erhalten ist.</p>
-            <p>Unsere Erfassung hält den heutigen Zustand fest: die Ansicht vom See mit der
-              alten Ufermauer, die Straßenseite hinter der Hecke und einige Aufnahmen auf dem
-              Grundstück selbst, die wir mit Zustimmung der Eigentümer machen durften.</p>
-            <p>Der freistehende Altbaum an der Nordseite ist auch für sich genommen
-              bemerkenswert. Er kehrt auf fast allen Aufnahmen wieder und macht den Standort
-              selbst dort eindeutig, wo vom Haus nur ein Ausschnitt zu sehen ist.</p>
+            <p>Das Anwesen liegt am Ostufer des Attersees, dort wo die Landesstraße zwischen
+              Hang und Wasser eingezwängt verläuft und die Grundstücke schmal zum See hin
+              abfallen. Von der Straße aus sieht man von den meisten Häusern dieser Uferzeile
+              kaum mehr als das Dach — erst vom Wasser her zeigen sie sich ganz.</p>
+            <p>Der Blick geht von hier nach Westen über den See auf das gegenüberliegende Ufer,
+              im Süden auf die Wände des Höllengebirges. Das Abendlicht kommt an diesem Ufer
+              von vorn über das Wasser; deshalb entstehen unsere Aufnahmen hier meist spät
+              am Tag. Der gelb verputzte Bau mit dem erhöhten Eckteil und die hölzerne
+              Bootshütte bilden ein Ensemble, wie es am Attersee nur noch an wenigen Stellen
+              vollständig erhalten ist.</p>
+            <p>Unsere Erfassung hält den heutigen Zustand fest. Der alte Baum vor der Südseite
+              kehrt auf fast allen Aufnahmen wieder und macht den Standort selbst dort
+              eindeutig, wo vom Haus nur ein Ausschnitt zu sehen ist.</p>
           </div>
           <div class="ver-fakten">
-            <span><b>Gemeinde:</b> Nußdorf am Attersee</span>
-            <span><b>Lage:</b> Westufer, zwischen Straße und See</span>
+            <span><b>Gewässer:</b> Attersee</span>
+            <span><b>Lage:</b> Ostufer, zwischen Straße und See</span>
             <span><b>Erfassung:</b> heuer im Frühjahr</span>
             <span><b>Aufnahmen:</b> 7</span>
           </div>
@@ -854,9 +880,9 @@
         <div class="ver-raster" id="verRaster"></div>
 
         <div class="ver-fuss">
-          Verein für Ortsbildpflege Nußdorf am Attersee, Seestraße 14<br>
+          Verein für Ortsbildpflege Salzkammergut · ZVR 4 128 977<br>
           Fotodokumentation betreut von Hrn. Alois Bramberger · Letzte Ergänzung: heuer im Frühjahr<br>
-          Diese Seite wurde mit Unterstützung der Gemeinde erstellt.
+          Aufnahmen von Vereinsmitgliedern. Wiedergabe nur nach Rücksprache.
         </div>
       </div>
 
@@ -898,6 +924,7 @@
       <div class="lbu" id="lupeBu"></div>
     </div>
     <div class="lupe-werkzeug">
+      <span class="lzaehler" id="lupeZaehler">1 / 7</span>
       <button class="lknopf" id="lupeRaus" title="Verkleinern">
         <svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>
       </button>
@@ -909,7 +936,13 @@
     </div>
   </div>
   <div class="lupe-buehne" id="lupeBuehne">
+    <button class="lpfeil links" id="lupeVor" title="Vorheriges Bild (Pfeil links)">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
     <img id="lupeBild" alt="">
+    <button class="lpfeil rechts" id="lupeNach" title="Nächstes Bild (Pfeil rechts)">
+      <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
   </div>
 </div>
 
@@ -933,7 +966,7 @@
     </div>
     <div class="ptext">
       <div class="ptitel">Suche 100 % abgeschlossen</div>
-      <div class="pvorschau">Fotodokumentation Ortsbildpflege</div>
+      <div class="pvorschau">Ortsbildpflege Salzkammergut</div>
     </div>
   </div>
 </div>
@@ -961,7 +994,7 @@
       <div class="txt">Extrahierter Bildordner mit sechs Aufnahmen, Explorer-Ansicht.</div>
     </button>
     <button class="karte" data-sz="archiv">
-      <div class="nr">Archiv</div><div class="ort">Ortsbildpflege Nußdorf</div>
+      <div class="nr">Archiv</div><div class="ort">Ortsbildpflege Salzkammergut</div>
       <div class="txt">Fotodokumentation des Vereins, bereits auf das Objekt gefiltert.</div>
     </button>
   </div>
@@ -1000,12 +1033,12 @@
       <img class="vorschau" alt="">
     </div>
     <div class="ladezeile" data-ziel="baum">
-      <div class="was"><b>Baum an der Nordseite</b> — das Bild, das Yara vergrößert <span class="haken">✓</span><small>Baum_am_Ufer.jpg · in beiden Ansichten</small></div>
+      <div class="was"><b>Baum an der Südseite</b> — das Bild, das Yara vergrößert <span class="haken">✓</span><small>Baum_am_Ufer.jpg · in beiden Ansichten</small></div>
       <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
       <img class="vorschau" alt="">
     </div>
     <div class="ladezeile" data-ziel="haus4">
-      <div class="was">Garten zum See, Kiefer und Bank <span class="haken">✓</span><small>Haus_Attersee_4.jpg</small></div>
+      <div class="was">Blick nach Westen über den See <span class="haken">✓</span><small>Haus_Attersee_4.jpg</small></div>
       <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
       <img class="vorschau" alt="">
     </div>
@@ -1026,8 +1059,8 @@
   <div class="fuss">
     Ansicht öffnen mit <kbd>1</kbd> (Mail) / <kbd>2</kbd> (Ordner) / <kbd>3</kbd> (Archiv),
     zurück zu dieser Auswahl mit <kbd>0</kbd><br>
-    Im vergrößerten Bild: Mausrad oder <kbd>+</kbd> / <kbd>−</kbd> zoomen, ziehen verschiebt,
-    <kbd>Esc</kbd> schließt<br>
+    Im vergrößerten Bild: Pfeile links und rechts blättern (im Kreis), Mausrad oder
+    <kbd>+</kbd> / <kbd>−</kbd> zoomen, ziehen verschiebt, <kbd>Esc</kbd> schließt<br>
     Vollbild mit <kbd>F11</kbd> (PC) bzw. <kbd>cmd ctrl F</kbd> (Mac)
   </div>
   <div class="fuss handy">
@@ -1133,10 +1166,10 @@ const MEDIEN = {
   haus1: { datei:"Haus_Attersee_1.jpg", label:"Ansicht vom See" },
   haus2: { datei:"Haus_Attersee_2.jpg", label:"Von der Straße" },
   haus3: { datei:"Haus_Attersee_3.jpg", label:"Bootshütte mit Steg" },
-  haus4: { datei:"Haus_Attersee_4.jpg", label:"Garten mit Kiefer" },
+  haus4: { datei:"Haus_Attersee_4.jpg", label:"Blick nach Westen über den See" },
   haus5: { datei:"Haus_Attersee_5.jpg", label:"Nordseite, Weg zum Ufer" },
   haus6: { datei:"Haus_Attersee_6.jpg", label:"Straßenansicht" },
-  baum:  { datei:"Baum_am_Ufer.jpg",    label:"Baum an der Nordseite" }
+  baum:  { datei:"Baum_am_Ufer.jpg",    label:"Baum an der Südseite" }
 };
 const ENDUNGEN = ["jpg","jpeg","JPG","JPEG","png","PNG","webp"];
 const MANUELL  = {};
@@ -1194,12 +1227,12 @@ const ORDNER_BILDER = [
 ];
 
 const ARCHIV_BILDER = [
-  { k:"haus1", nr:"114/01", bu:"Ansicht vom See: Wohnhaus, Bootshütte und Ufermauer." },
+  { k:"haus1", nr:"114/01", bu:"Ansicht vom See gegen das Ostufer: Wohnhaus, Bootshütte, Ufermauer." },
   { k:"haus3", nr:"114/02", bu:"Bootshütte mit Steg, vom Wasser aus aufgenommen." },
   { k:"haus2", nr:"114/03", bu:"Straßenseite, vom öffentlichen Gut aus. Zufahrt hinter der Hecke." },
   { k:"haus6", nr:"114/04", bu:"Straßenansicht mit dem erhöhten Bauteil und dem Ziegeldach." },
-  { k:"baum",  nr:"114/05", bu:"Der alte Baum an der Nordseite, unmittelbar vor der Fassade." },
-  { k:"haus4", nr:"114/06", bu:"Garten zum See mit der gekrümmten Kiefer und der Sitzbank." },
+  { k:"baum",  nr:"114/05", bu:"Der alte Baum vor der Südseite, unmittelbar an der Fassade." },
+  { k:"haus4", nr:"114/06", bu:"Blick vom Grundstück nach Westen über den See." },
   { k:"haus5", nr:"114/07", bu:"Nordseite mit den Kellerfenstern, Weg hinunter zum Ufer." }
 ];
 
@@ -1331,11 +1364,45 @@ document.getElementById("bildschirm-mail").addEventListener("click", e => {
 document.getElementById("suchfeld").addEventListener("input", popupStarten);
 document.getElementById("suchfeld").addEventListener("focus", popupStarten);
 
-document.getElementById("popupOrdner").addEventListener("click", () => {
-  popupVerstecken(); szeneOeffnen("ordner");
+/* Der gewaehlte Eintrag waechst aus seiner Position auf den ganzen Bildschirm,
+   dahinter wird umgeschaltet, dann blendet die Flaeche weg.                  */
+function mitUebergang(zielSzene, quelle){
+  const r = quelle.getBoundingClientRect();
+  popupVerstecken();
+
+  const ov = document.createElement("div");
+  ov.className = "uebergang";
+  ov.style.left   = r.left   + "px";
+  ov.style.top    = r.top    + "px";
+  ov.style.width  = r.width  + "px";
+  ov.style.height = r.height + "px";
+  document.body.appendChild(ov);
+  ov.getBoundingClientRect();            /* Reflow, damit der Uebergang startet */
+
+  requestAnimationFrame(() => {
+    ov.classList.add("voll");
+    ov.style.left = "0px"; ov.style.top = "0px";
+    ov.style.width = "100vw"; ov.style.height = "100vh";
+  });
+
+  let erledigt = false;
+  function abschluss(){
+    if(erledigt) return;
+    erledigt = true;
+    szeneOeffnen(zielSzene);
+    ov.style.transition = "opacity .28s ease";
+    ov.style.opacity = "0";
+    setTimeout(() => ov.remove(), 320);
+  }
+  ov.addEventListener("transitionend", e => { if(e.propertyName === "width") abschluss(); });
+  setTimeout(abschluss, 700);            /* Sicherheitsnetz, falls kein Ereignis kommt */
+}
+
+document.getElementById("popupOrdner").addEventListener("click", e => {
+  mitUebergang("ordner", e.currentTarget);
 });
-document.getElementById("popupArchiv").addEventListener("click", () => {
-  popupVerstecken(); szeneOeffnen("archiv");
+document.getElementById("popupArchiv").addEventListener("click", e => {
+  mitUebergang("archiv", e.currentTarget);
 });
 
 (function(){
@@ -1382,12 +1449,28 @@ function lupeSetzen(neu, mx, my){
   if(zoom === 1){ vx = 0; vy = 0; }
   lupeMalen();
 }
-function lupeOeffnen(schluessel, name, bu){
-  const quelle = document.querySelector('[data-medium="' + schluessel + '"]');
-  lbild.src = quelle ? quelle.src : greenscreen(MEDIEN[schluessel].datei);
-  document.getElementById("lupeName").textContent = name || "";
-  document.getElementById("lupeBu").textContent   = bu || "";
+/* Blaetterliste: je nach Ansicht der Bildordner oder die Vereinsgalerie.
+   Am Ende geht es wieder von vorn los.                                      */
+let LISTE = [], STELLE = 0;
+
+function lupeAnzeigen(){
+  const b = LISTE[STELLE];
+  if(!b) return;
+  const quelle = document.querySelector('[data-medium="' + b.k + '"]');
+  lbild.src = quelle ? quelle.src : greenscreen(MEDIEN[b.k].datei);
+  document.getElementById("lupeName").textContent = b.name || "";
+  document.getElementById("lupeBu").textContent   = b.bu   || "";
+  document.getElementById("lupeZaehler").textContent = (STELLE + 1) + " / " + LISTE.length;
   zoom = 1; vx = 0; vy = 0; lupeMalen();
+}
+function lupeBlaettern(richtung){
+  if(!LISTE.length) return;
+  STELLE = (STELLE + richtung + LISTE.length) % LISTE.length;   /* laeuft im Kreis */
+  lupeAnzeigen();
+}
+function lupeOeffnen(liste, stelle){
+  LISTE = liste; STELLE = stelle;
+  lupeAnzeigen();
   lupe.classList.add("offen");
 }
 function lupeSchliessen(){ lupe.classList.remove("offen"); }
@@ -1395,15 +1478,22 @@ function lupeSchliessen(){ lupe.classList.remove("offen"); }
 document.getElementById("expRaster").addEventListener("click", e => {
   const k = e.target.closest(".kachel");
   if(!k) return;
-  lupeOeffnen(k.getAttribute("data-bild"), k.getAttribute("data-name"),
-              "Attersee_Objekte_Kracher_A_Extrakt");
+  const liste = ORDNER_BILDER.map(b => ({ k:b.k, name:b.datei,
+                                          bu:"Attersee_Objekte_Kracher_A_Extrakt" }));
+  lupeOeffnen(liste, [...document.querySelectorAll("#expRaster .kachel")].indexOf(k));
 });
 document.getElementById("verRaster").addEventListener("click", e => {
   const f = e.target.closest(".ver-bild");
   if(!f) return;
-  lupeOeffnen(f.getAttribute("data-bild"), f.getAttribute("data-name"),
-              f.getAttribute("data-bu"));
+  const liste = ARCHIV_BILDER.map(b => ({ k:b.k, name:b.nr, bu:b.bu }));
+  lupeOeffnen(liste, [...document.querySelectorAll("#verRaster .ver-bild")].indexOf(f));
 });
+
+document.getElementById("lupeVor").addEventListener("click",  e => { e.stopPropagation(); lupeBlaettern(-1); });
+document.getElementById("lupeNach").addEventListener("click", e => { e.stopPropagation(); lupeBlaettern(+1); });
+/* Die Pfeile liegen ueber der Buehne - ein Druck darf kein Ziehen ausloesen. */
+["lupeVor","lupeNach"].forEach(id =>
+  document.getElementById(id).addEventListener("pointerdown", e => e.stopPropagation()));
 
 document.getElementById("lupeZu").addEventListener("click", lupeSchliessen);
 document.getElementById("lupeRein").addEventListener("click", () => lupeSetzen(zoom * 1.4));
@@ -1438,6 +1528,8 @@ document.addEventListener("keydown", e => {
   if(e.key === "Escape") lupeSchliessen();
   if(e.key === "+" || e.key === "=") lupeSetzen(zoom * 1.4);
   if(e.key === "-" || e.key === "_") lupeSetzen(zoom / 1.4);
+  if(e.key === "ArrowLeft"){  e.preventDefault(); lupeBlaettern(-1); }
+  if(e.key === "ArrowRight"){ e.preventDefault(); lupeBlaettern(+1); }
 });
 
 /* ============================================================================

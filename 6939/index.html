@@ -28,7 +28,10 @@ body{
 .rand{max-width:1120px;margin:0 auto;padding:26px 20px 70px}
 
 h1{font-size:25px;margin:0 0 6px;letter-spacing:-.01em}
-.unter{color:var(--grau);margin:0 0 26px;max-width:70ch}
+.unter{color:var(--grau);margin:0 0 18px;max-width:70ch}
+.zurueck{margin:0 0 24px}
+.zurueck a{color:var(--rot);text-decoration:none;font-size:14px;font-weight:600}
+.zurueck a:hover{text-decoration:underline}
 h2{font-size:16px;margin:0 0 4px;letter-spacing:.01em}
 .karte{
   background:var(--karte);border:1px solid var(--linie);border-radius:10px;
@@ -130,8 +133,13 @@ textarea{resize:vertical;min-height:38px;line-height:1.4}
     Startseite der Requisite. Hier wird das Beginndatum festgelegt und der Text jeder einzelnen
     Nachricht bearbeitet. Daraus entstehen die Tablet-Ansicht f&uuml;r die Szenen 6939 und 6943
     und der Ausdruck f&uuml;r die Fallwand, Szenen 6931 und 6936.
-    Alles bleibt in diesem Rechner gespeichert, es geht nichts ins Netz.
+    Die Einstellungen bleiben in diesem Browser, sie gehen an keinen Server.
   </p>
+
+  <!-- Zur&uuml;ck zur &Uuml;bersicht. Erscheint nur, wenn die Seite von einem
+       Server kommt; bei einer Datei am eigenen Rechner gibt es keine
+       &Uuml;bersicht, dort bleibt der Platz leer. -->
+  <p class="zurueck" id="zurueck" hidden><a href="../">&#8592; Zur&uuml;ck zur &Uuml;bersicht</a></p>
 
   <!-- ============ Datum ============ -->
   <div class="karte">
@@ -713,6 +721,8 @@ document.getElementById("nPlus").addEventListener("click", () => {
   DATEN.n.push({tag:v.tag, von:(v.von === "cr" ? "ak" : "cr"), zeit:v.zeit, art:"text", text:""});
   alles();
 });
+
+if(location.protocol !== "file:") document.getElementById("zurueck").hidden = false;
 
 ladenLokal();
 alles();

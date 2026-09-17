@@ -32,7 +32,7 @@
 
   FOTOS - wie bei den uebrigen Screens NICHT in der Datei enthalten.
     Die Seite sucht zuerst neben der HTML-Datei nach:
-      Haus_Attersee_1.jpg ... Haus_Attersee_5.jpg
+      Haus_Attersee_1.jpg ... Haus_Attersee_6.jpg
       Baum_am_Ufer.jpg
     Findet sie nichts, bleibt eine gruene Trackingflaeche stehen, bis das Foto
     ueber die Szenenauswahl vom Geraet zugewiesen wird. Zugewiesene Fotos
@@ -316,9 +316,8 @@
   .exp-inhalt{ flex:1; min-width:0; overflow-y:auto; padding:20px 24px 40px; }
   .exp-gruppe{ font-size:12.5px; font-weight:700; color:#6b7280; text-transform:uppercase;
                letter-spacing:.5px; margin:0 0 14px; }
-  /* Feste Dreierreihen: sechs Bilder ergeben 3+3, nie fuenf oben und eines allein. */
-  .exp-raster{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
-               gap:24px 22px; max-width:1000px; }
+  .exp-raster{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr));
+               gap:24px 22px; max-width:1180px; }
   .kachel{ cursor:pointer; border-radius:8px; padding:8px; border:1px solid transparent; }
   .kachel:hover{ background:#e8edf5; border-color:#cddcef; }
   .kachel .rahmen{ width:100%; aspect-ratio:4/3; border-radius:5px; overflow:hidden;
@@ -380,14 +379,12 @@
 
   .ver-galerietitel{ font-size:19px; color:var(--tanne); margin:0 0 4px; }
   .ver-galeriehinweis{ font-size:13.5px; color:var(--gedaempft); font-style:italic; margin:0 0 18px; }
-  .ver-raster{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:24px; }
+  .ver-raster{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:22px; }
   .ver-bild{ cursor:pointer; }
   .ver-bild .rahmen{ background:#fff; border:1px solid var(--rand); padding:7px;
                      box-shadow:0 1px 4px rgba(60,45,20,.13); }
   .ver-bild .innen{ width:100%; aspect-ratio:4/3; overflow:hidden; background:#e6e0d2; }
-  .ver-bild img{ width:100%; height:100%; object-fit:cover; display:block;
-                 filter:sepia(.22) contrast(.95); }
-  .ver-bild:hover img{ filter:sepia(.05); }
+  .ver-bild img{ width:100%; height:100%; object-fit:cover; display:block; }
   .ver-bild .bu{ font-size:13px; line-height:1.5; margin-top:8px; color:var(--gedaempft); }
   .ver-bild .bu b{ color:var(--schrift); font-weight:700; }
   .ver-fuss{ border-top:1px solid var(--rand); margin-top:8px; padding:18px 0 40px;
@@ -771,15 +768,15 @@
       </div>
 
       <div class="exp-inhalt">
-        <p class="exp-gruppe">Attersee_Objekte_Kracher_A_Extrakt — 6 Elemente</p>
+        <p class="exp-gruppe">Attersee_Objekte_Kracher_A_Extrakt — 7 Elemente</p>
         <div class="exp-raster" id="expRaster"></div>
       </div>
     </div>
 
     <div class="exp-status">
-      <span>6 Elemente</span>
+      <span>7 Elemente</span>
       <span>Bildformat JPEG</span>
-      <span id="expGroesse">18,4 MB</span>
+      <span id="expGroesse">9,1 MB</span>
     </div>
   </div>
 
@@ -798,15 +795,15 @@
         <span style="opacity:.35">&#8594;</span>
         <span style="opacity:.35">&#10227;</span>
       </div>
-      <div class="urlbar">sgkv-salzkammergut.at/bildarchiv/ufervillen-attersee/villa-huebner-kracher</div>
+      <div class="urlbar">ortsbildpflege-nussdorf.at/fotodokumentation/westufer/objekt-114</div>
     </div>
 
     <div class="ver-scroll">
 
       <div class="ver-kopf">
         <div class="ver-huelle">
-          <div class="vname">Salzkammergut Geschichts- und Heimatverein</div>
-          <div class="vunter">Historisches Bildarchiv — Ufervillen &amp; Landsitze</div>
+          <div class="vname">Verein für Ortsbildpflege Nußdorf am Attersee</div>
+          <div class="vunter">Fotodokumentation — Bauten und Gärten am Seeufer</div>
         </div>
       </div>
 
@@ -814,8 +811,8 @@
         <ul>
           <li>Startseite</li>
           <li>Über uns</li>
-          <li class="aktiv">Bildarchiv</li>
-          <li>Ortschroniken</li>
+          <li class="aktiv">Fotodokumentation</li>
+          <li>Ortschronik</li>
           <li>Veranstaltungen</li>
           <li>Mitglied werden</li>
           <li>Kontakt</li>
@@ -824,41 +821,41 @@
 
       <div class="ver-huelle">
         <div class="ver-brot">
-          Startseite <span>&gt;</span> Bildarchiv <span>&gt;</span> Ufervillen Attersee
-          <span>&gt;</span> Objekt: Villa Hübner-Kracher (Erbaut ca. 1923)
+          Startseite <span>&gt;</span> Fotodokumentation <span>&gt;</span> Westufer
+          <span>&gt;</span> Objekt 114: Wohnhaus mit Bootshütte
         </div>
-        <h1 class="ver-titel">Villa Hübner-Kracher, Attersee-Westufer</h1>
-        <div class="ver-untertitel">Objektnummer UV-114 · Bestand der Sammlung Hübner, übernommen 1978</div>
+        <h1 class="ver-titel">Objekt 114 — Wohnhaus mit Bootshütte, Westufer</h1>
+        <div class="ver-untertitel">Erfassung im heurigen Frühjahr · Aufnahmen vom See, von der Straße und vom Grundstück</div>
 
         <div class="ver-blatt">
           <div class="ver-text">
-            <p>Das Haus wurde um 1923 für den Linzer Textilhändler Ferdinand Hübner als
-              Sommersitz errichtet und blieb bis 1961 im Besitz der Familie. Der auffällige
-              Holzbalkon an der Seeseite ist eine Zutat der späten Zwanzigerjahre und wurde
-              nach dem Hochwasser von 1954 in vereinfachter Form wiederhergestellt.</p>
-            <p>Nach mehreren Besitzwechseln erwarb die Familie Kracher das Anwesen; seither
-              ist es von der Straße aus kaum mehr einsehbar. Die Aufnahmen unserer Sammlung
-              stammen daher überwiegend vom See her und aus den Jahren vor 1970.</p>
-            <p>Bemerkenswert ist die alte Uferweide unmittelbar vor dem Bootshaus, die auf
-              nahezu allen Aufnahmen des Objekts wiederkehrt und den Standort auch dort
-              zweifelsfrei bestimmbar macht, wo das Haus selbst nur angeschnitten ist.</p>
+            <p>Das Anwesen liegt am Westufer zwischen der Landesstraße und dem See. Der gelb
+              verputzte Bau mit dem erhöhten Eckteil und die hölzerne Bootshütte am Wasser
+              bilden zusammen ein Ensemble, wie es in dieser Vollständigkeit am Attersee
+              nur noch an wenigen Stellen erhalten ist.</p>
+            <p>Unsere Erfassung hält den heutigen Zustand fest: die Ansicht vom See mit der
+              alten Ufermauer, die Straßenseite hinter der Hecke und einige Aufnahmen auf dem
+              Grundstück selbst, die wir mit Zustimmung der Eigentümer machen durften.</p>
+            <p>Der freistehende Altbaum an der Nordseite ist auch für sich genommen
+              bemerkenswert. Er kehrt auf fast allen Aufnahmen wieder und macht den Standort
+              selbst dort eindeutig, wo vom Haus nur ein Ausschnitt zu sehen ist.</p>
           </div>
           <div class="ver-fakten">
-            <span><b>Errichtet:</b> ca. 1923</span>
             <span><b>Gemeinde:</b> Nußdorf am Attersee</span>
-            <span><b>Bauherr:</b> Ferdinand Hübner, Linz</span>
-            <span><b>Aufnahmen:</b> 6</span>
+            <span><b>Lage:</b> Westufer, zwischen Straße und See</span>
+            <span><b>Erfassung:</b> heuer im Frühjahr</span>
+            <span><b>Aufnahmen:</b> 7</span>
           </div>
         </div>
 
-        <h2 class="ver-galerietitel">Bildbestand zum Objekt</h2>
+        <h2 class="ver-galerietitel">Aufnahmen zum Objekt</h2>
         <p class="ver-galeriehinweis">Zum Vergrößern auf eine Aufnahme klicken.
-          Die Rechte liegen beim Verein; Wiedergabe nur nach schriftlicher Zustimmung.</p>
+          Die Bilder stammen von Mitgliedern des Vereins; Wiedergabe nur nach Rücksprache.</p>
         <div class="ver-raster" id="verRaster"></div>
 
         <div class="ver-fuss">
-          Salzkammergut Geschichts- und Heimatverein (SGKV), Seestraße 14, Nußdorf am Attersee<br>
-          Bildarchiv betreut von Hrn. OSR i. R. Alois Bramberger · Letzte Ergänzung des Bestandes: Frühjahr<br>
+          Verein für Ortsbildpflege Nußdorf am Attersee, Seestraße 14<br>
+          Fotodokumentation betreut von Hrn. Alois Bramberger · Letzte Ergänzung: heuer im Frühjahr<br>
           Diese Seite wurde mit Unterstützung der Gemeinde erstellt.
         </div>
       </div>
@@ -936,7 +933,7 @@
     </div>
     <div class="ptext">
       <div class="ptitel">Suche 100 % abgeschlossen</div>
-      <div class="pvorschau">Historisches Bildarchiv SGKV</div>
+      <div class="pvorschau">Fotodokumentation Ortsbildpflege</div>
     </div>
   </div>
 </div>
@@ -964,8 +961,8 @@
       <div class="txt">Extrahierter Bildordner mit sechs Aufnahmen, Explorer-Ansicht.</div>
     </button>
     <button class="karte" data-sz="archiv">
-      <div class="nr">Archiv</div><div class="ort">Heimatverein SGKV</div>
-      <div class="txt">Historisches Bildarchiv, bereits auf die Villa gefiltert.</div>
+      <div class="nr">Archiv</div><div class="ort">Ortsbildpflege Nußdorf</div>
+      <div class="txt">Fotodokumentation des Vereins, bereits auf das Objekt gefiltert.</div>
     </button>
   </div>
 
@@ -983,32 +980,37 @@
     <div class="titel">Fotos vom Gerät laden — nur nötig, wenn die Flächen grün bleiben</div>
 
     <div class="ladezeile" data-ziel="haus1">
-      <div class="was">Villa vom See aus <span class="haken">✓</span><small>Haus_Attersee_1.jpg</small></div>
-      <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
-      <img class="vorschau" alt="">
-    </div>
-    <div class="ladezeile" data-ziel="haus2">
-      <div class="was">Villa, Zufahrt <span class="haken">✓</span><small>Haus_Attersee_2.jpg</small></div>
+      <div class="was">Ansicht vom See, mit Bootshütte <span class="haken">✓</span><small>Haus_Attersee_1.jpg</small></div>
       <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
       <img class="vorschau" alt="">
     </div>
     <div class="ladezeile" data-ziel="haus3">
-      <div class="was">Bootshaus und Steg <span class="haken">✓</span><small>Haus_Attersee_3.jpg</small></div>
+      <div class="was">Bootshütte mit Steg, vom Wasser <span class="haken">✓</span><small>Haus_Attersee_3.jpg · Hochformat</small></div>
+      <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
+      <img class="vorschau" alt="">
+    </div>
+    <div class="ladezeile" data-ziel="haus2">
+      <div class="was">Von der Straße, hinter der Hecke <span class="haken">✓</span><small>Haus_Attersee_2.jpg</small></div>
+      <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
+      <img class="vorschau" alt="">
+    </div>
+    <div class="ladezeile" data-ziel="haus6">
+      <div class="was">Straßenansicht, ganze Fassade <span class="haken">✓</span><small>Haus_Attersee_6.jpg</small></div>
       <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
       <img class="vorschau" alt="">
     </div>
     <div class="ladezeile" data-ziel="baum">
-      <div class="was"><b>Baum am Ufer</b> — das Bild, das Yara vergrößert <span class="haken">✓</span><small>Baum_am_Ufer.jpg · in beiden Ansichten</small></div>
+      <div class="was"><b>Baum an der Nordseite</b> — das Bild, das Yara vergrößert <span class="haken">✓</span><small>Baum_am_Ufer.jpg · in beiden Ansichten</small></div>
       <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
       <img class="vorschau" alt="">
     </div>
     <div class="ladezeile" data-ziel="haus4">
-      <div class="was">Villa, Fassadendetail <span class="haken">✓</span><small>Haus_Attersee_4.jpg</small></div>
+      <div class="was">Garten zum See, Kiefer und Bank <span class="haken">✓</span><small>Haus_Attersee_4.jpg</small></div>
       <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
       <img class="vorschau" alt="">
     </div>
     <div class="ladezeile" data-ziel="haus5">
-      <div class="was">Garten zur Straße <span class="haken">✓</span><small>Haus_Attersee_5.jpg</small></div>
+      <div class="was">Nordseite, Weg hinunter zum Ufer <span class="haken">✓</span><small>Haus_Attersee_5.jpg</small></div>
       <label class="ladebtn">Foto wählen<input type="file" accept="image/*" hidden></label>
       <img class="vorschau" alt="">
     </div>
@@ -1128,12 +1130,13 @@ document.addEventListener("keydown", e => {
    Datei  3. nichts davon -> gruene Trackingflaeche mit Dateinamen.
    ========================================================================== */
 const MEDIEN = {
-  haus1: { datei:"Haus_Attersee_1.jpg", label:"Villa vom See" },
-  haus2: { datei:"Haus_Attersee_2.jpg", label:"Villa Zufahrt" },
-  haus3: { datei:"Haus_Attersee_3.jpg", label:"Bootshaus" },
-  baum:  { datei:"Baum_am_Ufer.jpg",    label:"Baum am Ufer" },
-  haus4: { datei:"Haus_Attersee_4.jpg", label:"Fassadendetail" },
-  haus5: { datei:"Haus_Attersee_5.jpg", label:"Garten" }
+  haus1: { datei:"Haus_Attersee_1.jpg", label:"Ansicht vom See" },
+  haus2: { datei:"Haus_Attersee_2.jpg", label:"Von der Straße" },
+  haus3: { datei:"Haus_Attersee_3.jpg", label:"Bootshütte mit Steg" },
+  haus4: { datei:"Haus_Attersee_4.jpg", label:"Garten mit Kiefer" },
+  haus5: { datei:"Haus_Attersee_5.jpg", label:"Nordseite, Weg zum Ufer" },
+  haus6: { datei:"Haus_Attersee_6.jpg", label:"Straßenansicht" },
+  baum:  { datei:"Baum_am_Ufer.jpg",    label:"Baum an der Nordseite" }
 };
 const ENDUNGEN = ["jpg","jpeg","JPG","JPEG","png","PNG","webp"];
 const MANUELL  = {};
@@ -1181,21 +1184,23 @@ function medienSetzen(){
    Die beiden Bilderansichten werden aus derselben Liste gebaut.
    -------------------------------------------------------------------------- */
 const ORDNER_BILDER = [
-  { k:"haus1", datei:"IMG_0338.jpg", meta:"4,2 MB" },
-  { k:"haus2", datei:"IMG_0339.jpg", meta:"3,8 MB" },
-  { k:"haus3", datei:"IMG_0340.jpg", meta:"2,9 MB" },
-  { k:"baum",  datei:"IMG_0341.jpg", meta:"3,1 MB" },
-  { k:"haus4", datei:"IMG_0344.jpg", meta:"2,2 MB" },
-  { k:"haus5", datei:"IMG_0347.jpg", meta:"2,2 MB" }
+  { k:"haus1", datei:"IMG_0338.jpg", meta:"1,2 MB" },
+  { k:"haus3", datei:"IMG_0339.jpg", meta:"0,9 MB" },
+  { k:"haus2", datei:"IMG_0340.jpg", meta:"0,8 MB" },
+  { k:"baum",  datei:"IMG_0341.jpg", meta:"2,0 MB" },
+  { k:"haus4", datei:"IMG_0344.jpg", meta:"1,7 MB" },
+  { k:"haus5", datei:"IMG_0347.jpg", meta:"1,8 MB" },
+  { k:"haus6", datei:"IMG_0351.jpg", meta:"0,7 MB" }
 ];
 
 const ARCHIV_BILDER = [
-  { k:"haus3", nr:"UV-114/02", bu:"Bootshaus und Steg, Aufnahme um 1938. Sammlung Hübner." },
-  { k:"baum",  nr:"UV-114/05", bu:"Die alte Uferweide vor dem Bootshaus. Undatiert, vermutlich Fünfzigerjahre." },
-  { k:"haus1", nr:"UV-114/01", bu:"Ansicht von der Seeseite, kurz nach der Fertigstellung." },
-  { k:"haus5", nr:"UV-114/07", bu:"Garten zur Straße hin, vor der Errichtung der Mauer." },
-  { k:"haus4", nr:"UV-114/09", bu:"Detail des Holzbalkons an der Südseite, nach der Wiederherstellung 1955." },
-  { k:"haus2", nr:"UV-114/11", bu:"Zufahrt von Norden. Die Torpfeiler sind heute nicht mehr erhalten." }
+  { k:"haus1", nr:"114/01", bu:"Ansicht vom See: Wohnhaus, Bootshütte und Ufermauer." },
+  { k:"haus3", nr:"114/02", bu:"Bootshütte mit Steg, vom Wasser aus aufgenommen." },
+  { k:"haus2", nr:"114/03", bu:"Straßenseite, vom öffentlichen Gut aus. Zufahrt hinter der Hecke." },
+  { k:"haus6", nr:"114/04", bu:"Straßenansicht mit dem erhöhten Bauteil und dem Ziegeldach." },
+  { k:"baum",  nr:"114/05", bu:"Der alte Baum an der Nordseite, unmittelbar vor der Fassade." },
+  { k:"haus4", nr:"114/06", bu:"Garten zum See mit der gekrümmten Kiefer und der Sitzbank." },
+  { k:"haus5", nr:"114/07", bu:"Nordseite mit den Kellerfenstern, Weg hinunter zum Ufer." }
 ];
 
 function ansichtenBauen(){

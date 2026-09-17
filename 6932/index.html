@@ -218,6 +218,35 @@
   .anhang .atitel{ font-size:14.5px; font-weight:700; color:var(--txt); }
   .anhang .agroesse{ font-size:12.5px; color:var(--grau); margin-top:1px; }
 
+  /* ---------------- Sandwichmenue: zurueck zur Auswahl / Uebersicht ---------------- */
+  .sandwich{ flex:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
+             width:32px; height:32px; border-radius:6px; }
+  .sandwich svg{ width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:2;
+                 stroke-linecap:round; }
+  .sandwich.hell{ color:#c6cbd4; }
+  .sandwich.hell:hover{ background:rgba(255,255,255,.1); }
+  .sandwich.dunkel{ color:#4b5159; }
+  .sandwich.dunkel:hover{ background:rgba(0,0,0,.08); }
+
+  .smenue{
+    position:fixed; left:12px; top:56px; z-index:140; display:none;
+    background:#232a35; color:#e8eaee; border-radius:10px; min-width:260px; overflow:hidden;
+    box-shadow:0 12px 34px rgba(0,0,0,.45);
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  .smenue.offen{ display:block; }
+  .smenue .kopf{ font-size:11.5px; text-transform:uppercase; letter-spacing:.6px;
+                 color:#8991a0; padding:12px 16px 6px; }
+  .smenue a, .smenue .eintrag{
+    display:flex; align-items:center; gap:12px; padding:11px 16px; cursor:pointer;
+    color:#e8eaee; text-decoration:none; font-size:14px;
+  }
+  .smenue a:hover, .smenue .eintrag:hover{ background:#2c3444; }
+  .smenue svg{ width:17px; height:17px; flex:none; fill:none; stroke:#9aa1ac; stroke-width:1.9;
+               stroke-linecap:round; stroke-linejoin:round; }
+  .smenue .klein{ display:block; font-size:12px; color:#9aa1ac; margin-top:1px; }
+  .smenue .trenner{ height:1px; background:rgba(255,255,255,.1); margin:4px 0; }
+
   /* ================================================================
      BESTEHENDES POPUP-LAYOUT  (aus der Screen-Library, zwei Eintraege)
      ================================================================ */
@@ -475,7 +504,7 @@
   <div class="bildschirm" id="bildschirm-mail">
 
     <div class="topbar">
-      <div class="hamburger" title="Menü">
+      <div class="sandwich hell" data-smenue="1" title="Menü — Auswahl und Übersicht">
         <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
       </div>
       <div class="app-titel">
@@ -510,7 +539,7 @@
         </div>
         <div class="ordner-eintrag aktiv">
           <svg viewBox="0 0 24 24"><path d="M3 8l9-5 9 5-9 5-9-5zM3 8v8l9 5 9-5V8"/></svg>
-          Posteingang <span class="badge">1</span>
+          Posteingang <span class="badge">3</span>
         </div>
         <div class="ordner-eintrag">
           <svg viewBox="0 0 24 24"><path d="M12 17.3l-6.2 3.6 1.6-6.9L2 9.2l7-.6L12 2l3 6.6 7 .6-5.4 4.8 1.6 6.9z"/></svg>
@@ -564,10 +593,52 @@
           <div class="lvorschau">Die Anfrage wurde an den Betreiber weitergeleitet, mit …</div>
         </div>
 
+        <div class="listeneintrag ungelesen">
+          <div class="von"><span class="punkt"></span><b>StA Linz, Mag. Kohlhofer</b><span class="lzeit">07:38</span></div>
+          <div class="lbetreff">Anordnung Auskunft über Vermittlungsdaten § 76a StPO</div>
+          <div class="lvorschau">Die gerichtliche Bewilligung liegt vor. Bitte um Übermittlung …</div>
+        </div>
+
+        <div class="listeneintrag ungelesen">
+          <div class="von"><span class="punkt"></span><b>A1 Rechtsauskunft</b><span class="lzeit">07:11</span></div>
+          <div class="lbetreff">RE: Rufdatenrückerfassung — Zeitraum 12. bis 14., Bereitstellung</div>
+          <div class="lvorschau">Die Daten stehen im gesicherten Portal für 14 Tage bereit …</div>
+        </div>
+
+        <div class="listeneintrag">
+          <div class="von"><b>Auswertung LKA OÖ</b><span class="lzeit">06:47</span></div>
+          <div class="lbetreff">Bildmaterial Überwachungskamera Hafenstraße — 42 GB bereitgestellt</div>
+          <div class="lvorschau">Der Sichtungsordner ist freigegeben. Zeitstempel weichen um …</div>
+        </div>
+
+        <div class="listeneintrag">
+          <div class="von"><b>EKIS-Servicestelle</b><span class="lzeit">Gestern</span></div>
+          <div class="lbetreff">Abfrageprotokoll — Monatsübersicht Ihrer Anfragen</div>
+          <div class="lvorschau">Wie jeden Monat übermitteln wir Ihnen die Aufstellung Ihrer …</div>
+        </div>
+
         <div class="listeneintrag">
           <div class="von"><b>Spurensicherung</b><span class="lzeit">Gestern</span></div>
           <div class="lbetreff">RE: Spurensicherung Pralinenwelt — Abschlussbericht</div>
           <div class="lvorschau">Anbei wie besprochen der Abschlussbericht samt Anlagen …</div>
+        </div>
+
+        <div class="listeneintrag">
+          <div class="von"><b>Zentrale Zulassungsevidenz</b><span class="lzeit">Gestern</span></div>
+          <div class="lbetreff">Halterabfrage — Sammelauskunft zu 6 Kennzeichen</div>
+          <div class="lvorschau">Zu fünf der angefragten Kennzeichen liegen Datensätze vor …</div>
+        </div>
+
+        <div class="listeneintrag">
+          <div class="von"><b>Personalabteilung LPD OÖ</b><span class="lzeit">Di</span></div>
+          <div class="lbetreff">Fortbildung „Auswertung offener Quellen" — Restplätze</div>
+          <div class="lvorschau">Für den Lehrgang im Herbst sind noch vier Plätze frei …</div>
+        </div>
+
+        <div class="listeneintrag">
+          <div class="von"><b>IT-Betrieb BMI</b><span class="lzeit">Di</span></div>
+          <div class="lbetreff">Wartungsfenster zentrale Applikationen — Samstag 22:00 bis 02:00</div>
+          <div class="lvorschau">In diesem Zeitraum stehen Abfragen nur eingeschränkt zur …</div>
         </div>
       </div>
 
@@ -657,6 +728,9 @@
   <div class="bildschirm" id="bildschirm-ordner">
 
     <div class="exp-kopf">
+      <div class="sandwich dunkel" data-smenue="1" title="Menü — Auswahl und Übersicht">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </div>
       <div class="exp-nav">
         <div class="knopf" id="expZurueck" title="Zurück zum Posteingang">
           <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
@@ -716,6 +790,9 @@
   <div class="bildschirm" id="bildschirm-archiv">
 
     <div class="ver-browser">
+      <div class="sandwich dunkel" data-smenue="1" title="Menü — Auswahl und Übersicht">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </div>
       <div class="navicons">
         <span id="verZurueck" title="Zurück zum Posteingang" style="cursor:pointer">&#8592;</span>
         <span style="opacity:.35">&#8594;</span>
@@ -790,6 +867,24 @@
   </div>
 
 </div><!-- /app -->
+
+
+<div class="smenue" id="smenue">
+  <div class="kopf">Navigation</div>
+  <div class="eintrag" id="smZurueck">
+    <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h9a6 6 0 0 1 6 6v3"/></svg>
+    <span>Einen Schritt zurück<span class="klein">Rücktaste</span></span>
+  </div>
+  <div class="eintrag" id="smAuswahl">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>Szenenauswahl dieses Screens<span class="klein">Taste 0</span></span>
+  </div>
+  <div class="trenner"></div>
+  <a href="../">
+    <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    <span>Übersicht aller Screens<span class="klein">Bildschirmgrafiken SOKO Linz</span></span>
+  </a>
+</div>
 
 
 <!-- ============================================================
@@ -961,8 +1056,44 @@ function bildschirmZeigen(name){
   const sc = document.querySelector(".ver-scroll");
   if(sc && name === "archiv") sc.scrollTop = 0;
 }
-function szeneOeffnen(nr){ if(SZENEN[nr]) bildschirmZeigen(SZENEN[nr].bildschirm); }
+/* Schrittverlauf, damit die Ruecktaste einen Schritt zurueckgeht */
+const VERLAUF = [];
+function szeneOeffnen(nr, merken){
+  if(!SZENEN[nr]) return;
+  const vorher = AKTUELLER_BILDSCHIRM;
+  if(merken !== false && vorher && vorher !== SZENEN[nr].bildschirm) VERLAUF.push(vorher);
+  bildschirmZeigen(SZENEN[nr].bildschirm);
+}
+const ZU_SZENE = { mail:"6932", ordner:"ordner", archiv:"archiv" };
+function schrittZurueck(){
+  if(document.getElementById("smenue").classList.contains("offen")){ smenueZu(); return; }
+  if(lupe.classList.contains("offen")){ lupeSchliessen(); return; }
+  if(document.body.classList.contains("waehlen")){ document.body.classList.remove("waehlen"); return; }
+  const vorher = VERLAUF.pop();
+  if(vorher) bildschirmZeigen(vorher);
+  else wahlZeigen();
+}
 function wahlZeigen(){ document.body.classList.add("waehlen"); }
+
+/* ---------------------------------------------------------------------------
+   Sandwichmenue links oben - auf allen drei Ansichten derselbe Knopf.
+   -------------------------------------------------------------------------- */
+function smenueZu(){ document.getElementById("smenue").classList.remove("offen"); }
+document.addEventListener("click", e => {
+  const knopf = e.target.closest ? e.target.closest("[data-smenue]") : null;
+  const menue = document.getElementById("smenue");
+  if(knopf){
+    e.stopPropagation();
+    menue.classList.toggle("offen");
+    const r = knopf.getBoundingClientRect();
+    menue.style.left = Math.round(r.left) + "px";
+    menue.style.top  = Math.round(r.bottom + 8) + "px";
+    return;
+  }
+  if(!e.target.closest("#smenue")) smenueZu();
+});
+document.getElementById("smAuswahl").addEventListener("click", () => { smenueZu(); wahlZeigen(); });
+document.getElementById("smZurueck").addEventListener("click", () => { smenueZu(); schrittZurueck(); });
 
 document.addEventListener("click", e => {
   const k = e.target.closest ? e.target.closest(".karte") : null;
@@ -974,6 +1105,7 @@ document.addEventListener("click", e => {
 const TASTEN = { "1":"6932", "2":"ordner", "3":"archiv" };
 document.addEventListener("keydown", e => {
   if(e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if(e.key === "Backspace"){ e.preventDefault(); schrittZurueck(); return; }
   if(TASTEN[e.key]){ szeneOeffnen(TASTEN[e.key]); document.body.classList.remove("waehlen"); }
   if(e.key === "0") wahlZeigen();
 });
@@ -1185,8 +1317,11 @@ function popupStarten(){
   }, POPUP_MS);
 }
 
+/* Jeder Klick im Mail-Bildschirm startet die Verzoegerung - egal wohin.
+   Nur das Sandwichmenue nicht, das ist Bedienung hinter der Kamera.        */
 document.getElementById("bildschirm-mail").addEventListener("click", e => {
-  if(e.target.closest("[data-loest]")) popupStarten();
+  if(e.target.closest("[data-smenue]")) return;
+  popupStarten();
 });
 document.getElementById("suchfeld").addEventListener("input", popupStarten);
 document.getElementById("suchfeld").addEventListener("focus", popupStarten);
@@ -1210,8 +1345,8 @@ document.getElementById("popupArchiv").addEventListener("click", () => {
 })();
 
 /* Zurueck-Knoepfe der beiden Ansichten */
-document.getElementById("expZurueck").addEventListener("click", () => szeneOeffnen("6932"));
-document.getElementById("verZurueck").addEventListener("click", () => szeneOeffnen("6932"));
+document.getElementById("expZurueck").addEventListener("click", schrittZurueck);
+document.getElementById("verZurueck").addEventListener("click", schrittZurueck);
 
 /* ============================================================================
    5. VOLLBILD-EINZELANSICHT MIT ZOOM

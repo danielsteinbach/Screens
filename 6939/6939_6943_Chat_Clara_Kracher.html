@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Damit die Seite auf dem iPad ueber "Zum Home-Bildschirm" ohne
+     Safari-Leisten startet. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chat">
+<meta name="theme-color" content="#075e54">
 <title>Chatverlauf</title>
 <meta name="description" content="Requisite SOKO Linz 2026, Block II – Chatverlauf Clara Roithamer / Adrian Kracher. Nur fuer den Dreh.">
 <style>
@@ -25,10 +32,41 @@ body{
   color:var(--text);font-size:17px;overflow:hidden;
 }
 .app{
+  position:relative;
   max-width:900px;margin:0 auto;height:100dvh;height:100vh;
   display:flex;flex-direction:column;background:var(--papier);
   box-shadow:0 0 40px rgba(0,0,0,.35);
 }
+
+/* ---------- Menue hinter den drei Punkten ----------
+   Enthaelt den Vollbildschalter und den Weg zurueck zur Startseite.
+   Zugeklappt ist davon nichts zu sehen. */
+.punkte{
+  border:0;background:none;padding:0;margin:0;cursor:pointer;
+  display:flex;align-items:center;color:inherit;
+}
+.menue{
+  position:absolute;right:10px;top:calc(67px + env(safe-area-inset-top));z-index:30;display:none;
+  background:#fff;border-radius:9px;padding:6px 0;min-width:250px;
+  box-shadow:0 8px 28px rgba(0,0,0,.30);
+}
+.menue.offen{display:block}
+.menue button,.menue a{
+  display:block;width:100%;box-sizing:border-box;text-align:left;
+  background:none;border:0;font:inherit;font-size:16px;color:var(--text);
+  padding:13px 20px;cursor:pointer;text-decoration:none;
+}
+.menue button:hover,.menue a:hover{background:#f1f1f1}
+.menue .trennlinie{height:1px;background:#e7e7e7;margin:5px 0}
+
+/* kurzer Hinweis am unteren Rand */
+.wink{
+  position:absolute;left:50%;bottom:86px;transform:translateX(-50%) translateY(14px);
+  background:rgba(20,26,24,.93);color:#fff;border-radius:9px;
+  padding:12px 17px;font-size:14.5px;line-height:1.4;max-width:86%;
+  opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:40;
+}
+.wink.da{opacity:1;transform:translateX(-50%) translateY(0)}
 /* ---------- Kopfleiste ---------- */
 .kopf{
   flex:0 0 auto;display:flex;align-items:center;gap:12px;
@@ -136,9 +174,20 @@ body{
     <div class="ikonen">
       <svg viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>
       <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1l-2.22 2.23z"/></svg>
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+      <button class="punkte" id="punkte" aria-label="Menü">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+      </button>
     </div>
   </div>
+
+  <div class="menue" id="menue">
+    <button id="vollbild">Vollbild</button>
+    <div class="trennlinie"></div>
+    <a id="zurStartseite" href="#">Startseite, Einstellungen</a>
+  </div>
+
+  <div class="wink" id="wink"></div>
+
   <div class="verlauf" id="verlauf"></div>
   <div class="fuss">
     <div class="feld">
@@ -166,12 +215,12 @@ const BILD_KRACHER = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAY
    wenn dort etwas geaendert wird. Von Hand aendern geht auch.
    -------------------------------------------------------------- */
 const DATEN = {
-  stand: "2026-09-18",                 /* Stand dieser Lieferung, siehe Liesmich */
+  stand: "2026-09-18-2",               /* Stand dieser Lieferung, siehe Liesmich */
   start: "2026-03-22",                 /* Tag der ersten Nachricht */
   tage: [0, 14, 25, 26, 44],           /* weitere Tage als Abstand in Tagen */
   jahr: false,                         /* Jahreszahl bei den Datumsangaben zeigen */
   kontakt: "Adrian Kracher",
-  status: "",                          /* leer = wird aus dem Verlauf berechnet */
+  status: "Gestern",                   /* leer = Datum wird aus dem Verlauf berechnet */
   amt: "Landeskriminalamt – Auswertung mobiler Datenträger",
   asservat: "2026/AS-0473-11",
   sicher: "",                          /* leer = letzter Tag + 8 Tage */
@@ -397,6 +446,77 @@ document.getElementById("bildwahl").addEventListener("change", ev => {
   l.readAsDataURL(d);
 });
 
+/* ------------------------------------------------------------------
+   Das Menue hinter den drei Punkten oben rechts.
+   Darin: Vollbild und der Weg zurueck zur Startseite.
+   ------------------------------------------------------------------ */
+const MENUE = document.getElementById("menue");
+
+function menueAuf(){ MENUE.classList.add("offen"); vollbildBeschriften(); }
+function menueZu(){  MENUE.classList.remove("offen"); }
+
+document.getElementById("punkte").addEventListener("click", e => {
+  e.stopPropagation();
+  MENUE.classList.contains("offen") ? menueZu() : menueAuf();
+});
+MENUE.addEventListener("click", e => e.stopPropagation());
+document.addEventListener("click", menueZu);
+
+/* kurzer Hinweis unten */
+let winkUhr = null;
+function wink(t){
+  const w = document.getElementById("wink");
+  w.textContent = t;
+  w.classList.add("da");
+  clearTimeout(winkUhr);
+  winkUhr = setTimeout(() => w.classList.remove("da"), 5200);
+}
+
+/* ---------- Vollbild ----------
+   Auf dem iPad haengt es von der Safari-Fassung ab, ob das geht.
+   Klappt es nicht, steht der zuverlaessige Weg im Hinweis:
+   ueber "Zum Home-Bildschirm" startet die Seite ohne Safari-Leisten. */
+function imVollbild(){
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+function vollbildBeschriften(){
+  const k = document.getElementById("vollbild");
+  if(k) k.textContent = imVollbild() ? "Vollbild beenden" : "Vollbild";
+}
+function vollbildHinweis(){
+  wink("Vollbild geht in diesem Browser nicht. Auf dem iPad: Teilen-Symbol, "
+     + "dann „Zum Home-Bildschirm“ – von dort startet die Seite ohne Safari-Leisten.");
+}
+function vollbildUmschalten(){
+  const e = document.documentElement;
+  try{
+    if(imVollbild()){
+      const aus = document.exitFullscreen || document.webkitExitFullscreen;
+      if(aus) aus.call(document);
+    }else{
+      const ein = e.requestFullscreen || e.webkitRequestFullscreen;
+      if(!ein){ vollbildHinweis(); return; }
+      const p = ein.call(e);
+      if(p && p.catch) p.catch(vollbildHinweis);
+    }
+  }catch(x){ vollbildHinweis(); }
+  setTimeout(vollbildBeschriften, 350);
+}
+document.getElementById("vollbild").addEventListener("click", () => {
+  menueZu();
+  vollbildUmschalten();
+});
+document.addEventListener("fullscreenchange", vollbildBeschriften);
+document.addEventListener("webkitfullscreenchange", vollbildBeschriften);
+
+/* ---------- Weg zurueck zur Startseite ----------
+   Online heisst sie index.html, in der Dropbox Index_Chat_bearbeiten.html.
+   Liegt sie woanders, hier den Namen eintragen. */
+const STARTSEITE = (location.protocol === "file:")
+  ? "Index_Chat_bearbeiten.html"
+  : "index.html";
+document.getElementById("zurStartseite").setAttribute("href", STARTSEITE);
+
 /* ---------- Sprachnachricht ---------- */
 let tonLaeuft = null;
 function tonStarten(){
@@ -448,11 +568,14 @@ const tk = document.getElementById("tonKnopf");
 if(tk) tk.addEventListener("click", tonStarten);
 if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
 
-/* Taste B: eigenes Foto vom Geraet. Taste 0: wieder vergessen. */
+/* Tasten:  B  eigenes Foto vom Geraet    0  Foto wieder vergessen
+            F  Vollbild                  Esc  Menue zu                */
 document.addEventListener("keydown", e => {
   const t = (e.key || "").toLowerCase();
   if(t === "b"){ document.getElementById("bildwahl").click(); }
   if(t === "0"){ try{ localStorage.removeItem("chat_ck_bild"); }catch(x){} location.reload(); }
+  if(t === "f"){ vollbildUmschalten(); }
+  if(e.key === "Escape"){ menueZu(); }
 });
 </script>
 </body>

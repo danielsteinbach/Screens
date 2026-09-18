@@ -104,7 +104,8 @@ table.daten td.c{width:36mm;font-weight:600;padding:1.1mm 3mm 1.1mm 8mm}
    -------------------------------------------------------------- */
 const DATEN = {
   start: "2026-03-22",                 /* Tag der ersten Nachricht */
-  tage: [0, 25, 26, 44],               /* weitere Tage als Abstand in Tagen */
+  tage: [0, 14, 25, 26, 44],           /* weitere Tage als Abstand in Tagen */
+  jahr: false,                         /* Jahreszahl bei den Datumsangaben zeigen */
   kontakt: "Adrian Kracher",
   status: "",                          /* leer = wird aus dem Verlauf berechnet */
   amt: "Landeskriminalamt – Auswertung mobiler Datenträger",
@@ -123,20 +124,28 @@ const DATEN = {
     {tag:0, von:"ak", zeit:"21:17", art:"text", text:"Perfekt. Du bist perfekt 😘"},
     {tag:0, von:"cr", zeit:"21:18", art:"text", text:"Hör auf 🙈❤️"},
 
-    {tag:1, von:"ak", zeit:"18:22", art:"text", text:"Wann sehen wir uns?"},
-    {tag:1, von:"cr", zeit:"19:47", art:"text", text:"Ich brauch grad etwas Abstand"},
-    {tag:1, von:"ak", zeit:"19:48", art:"text", text:"Das versteh ich nicht. Was hab ich falsch gemacht?"},
-    {tag:1, von:"cr", zeit:"20:31", art:"text", text:"Bitte ruf mich nicht mehr an"},
-    {tag:2, von:"ak", zeit:"00:12", art:"text", text:"Clara ich lieb dich. Das weißt du."},
-    {tag:2, von:"cr", zeit:"07:05", art:"text", text:"Das ändert nichts. Bitte akzeptier das."},
-    {tag:2, von:"ak", zeit:"07:09", art:"text", text:"Ich kann das nicht einfach so stehen lassen"},
+    {tag:1, von:"ak", zeit:"09:12", art:"text", text:"Ich hab heut beim Frühstück an dich gedacht. Komisch, oder? ☕"},
+    {tag:1, von:"cr", zeit:"10:38", art:"text", text:"Du machst das absichtlich 🙄❤️"},
+    {tag:1, von:"ak", zeit:"10:41", art:"text", text:"Nur wenn es hilft 😄 Wann bist du wieder in der Stadt?"},
+    {tag:1, von:"cr", zeit:"11:05", art:"text", text:"Nächste Woche wahrscheinlich. Warum?"},
+    {tag:1, von:"ak", zeit:"11:07", art:"text", text:"Ich kenn da ein kleines Lokal. Diskret. Niemand kennt mich dort."},
+    {tag:1, von:"cr", zeit:"12:20", art:"text", text:"Das ist genau das Problem, Adrian."},
+    {tag:1, von:"ak", zeit:"12:26", art:"text", text:"Clara bitte. Ich vermiss dich einfach."},
 
-    {tag:3, von:"ak", zeit:"22:38", art:"text", text:"Wir müssen reden. Nur einmal noch."},
-    {tag:3, von:"cr", zeit:"22:51", art:"text", text:"Nein."},
-    {tag:3, von:"ak", zeit:"22:52", art:"text", text:"Du kannst das nicht einfach abbrechen"},
-    {tag:3, von:"cr", zeit:"23:04", art:"text", text:"Doch. Und ich bitte dich zum letzten Mal."},
-    {tag:3, von:"ak", zeit:"23:19", art:"ton", text:"0:42"},
-    {tag:3, von:"cr", zeit:"23:41", art:"text", text:"Ich habe nichts mehr zu sagen."}
+    {tag:2, von:"ak", zeit:"18:22", art:"text", text:"Wann sehen wir uns?"},
+    {tag:2, von:"cr", zeit:"19:47", art:"text", text:"Ich brauch grad etwas Abstand"},
+    {tag:2, von:"ak", zeit:"19:48", art:"text", text:"Das versteh ich nicht. Was hab ich falsch gemacht?"},
+    {tag:2, von:"cr", zeit:"20:31", art:"text", text:"Bitte ruf mich nicht mehr an"},
+    {tag:3, von:"ak", zeit:"00:12", art:"text", text:"Clara ich lieb dich. Das weißt du."},
+    {tag:3, von:"cr", zeit:"07:05", art:"text", text:"Das ändert nichts. Bitte akzeptier das."},
+    {tag:3, von:"ak", zeit:"07:09", art:"text", text:"Ich kann das nicht einfach so stehen lassen"},
+
+    {tag:4, von:"ak", zeit:"22:38", art:"text", text:"Wir müssen reden. Nur einmal noch."},
+    {tag:4, von:"cr", zeit:"22:51", art:"text", text:"Nein."},
+    {tag:4, von:"ak", zeit:"22:52", art:"text", text:"Du kannst das nicht einfach abbrechen"},
+    {tag:4, von:"cr", zeit:"23:04", art:"text", text:"Doch. Und ich bitte dich zum letzten Mal."},
+    {tag:4, von:"ak", zeit:"23:19", art:"ton", text:"0:42"},
+    {tag:4, von:"cr", zeit:"23:41", art:"text", text:"Ich habe nichts mehr zu sagen."}
   ]
 };
 /*__DATEN-ENDE__*/
@@ -147,6 +156,7 @@ const MONATSNAME = ["Jänner","Februar","März","April","Mai","Juni","Juli",
                     "August","September","Oktober","November","Dezember"];
 
 function zwei(n){ return (n<10?"0":"") + n; }
+function mitJahr(){ return DATEN.jahr === true; }
 
 /* Der Tag der Nachricht: Beginndatum plus der Abstand dieses Tages. */
 function tagDatum(nr){
@@ -155,11 +165,25 @@ function tagDatum(nr){
   d.setDate(d.getDate() + ab);
   return d;
 }
+
+/* Ausgeschriebene Datumsangaben. Die Jahreszahl steht nur dabei,
+   wenn sie in den Daten eingeschaltet ist.  ->  "Sonntag, 22. März" */
+function tagMonat(d){ return d.getDate() + ". " + MONATSNAME[d.getMonth()]; }
 function langesDatum(d){
-  return WOCHENTAG[d.getDay()] + ", " + d.getDate() + ". " + MONATSNAME[d.getMonth()] + " " + d.getFullYear();
+  return WOCHENTAG[d.getDay()] + ", " + tagMonat(d) + (mitJahr() ? " " + d.getFullYear() : "");
 }
+function monatText(d){
+  return MONATSNAME[d.getMonth()] + (mitJahr() ? " " + d.getFullYear() : "");
+}
+/* Zum Vergleichen, ob ein neuer Monat beginnt: immer mit Jahr, damit
+   derselbe Monat in zwei Jahren nicht zusammenfaellt. */
+function monatSchluessel(d){ return d.getFullYear() + "-" + zwei(d.getMonth()+1); }
+
+/* Zahlenformate fuer den Ausdruck. Die Aktenfelder behalten das Jahr. */
 function kurzDatum(d){ return zwei(d.getDate()) + "." + zwei(d.getMonth()+1) + "." + d.getFullYear(); }
-function monatJahr(d){ return MONATSNAME[d.getMonth()] + " " + d.getFullYear(); }
+function stempelDatum(d){
+  return mitJahr() ? kurzDatum(d) : zwei(d.getDate()) + "." + zwei(d.getMonth()+1) + ".";
+}
 
 /* letzter Tag des Verlaufs */
 function letzterTag(){
@@ -178,7 +202,8 @@ function statusZeile(){
   let letzte = null;
   DATEN.n.forEach(m => { if(m.von === "ak") letzte = m; });
   if(!letzte) return "";
-  return "zuletzt online am " + kurzDatum(tagDatum(letzte.tag)) + " um " + letzte.zeit;
+  const d = tagDatum(letzte.tag);
+  return "zuletzt online am " + tagMonat(d) + (mitJahr() ? " " + d.getFullYear() : "") + " um " + letzte.zeit;
 }
 function sicherText(){
   return DATEN.sicher ? DATEN.sicher : kurzDatum(tagePlus(letzterTag(), 8));
@@ -253,11 +278,11 @@ function aufbauen(){
   let letzterM = "", letzterT = -1, nrM = 0, anlage = 0;
   DATEN.n.forEach(m => {
     const d  = tagDatum(m.tag);
-    const mj = monatJahr(d);
-    if(mj !== letzterM){
+    const sl = monatSchluessel(d);
+    if(sl !== letzterM){
       nrM++;
-      h += '<div class="abschnitt">Phase ' + nrM + ' – ' + esc(mj) + '</div>';
-      letzterM = mj; letzterT = -1;
+      h += '<div class="abschnitt">Phase ' + nrM + ' – ' + esc(monatText(d)) + '</div>';
+      letzterM = sl; letzterT = -1;
     }
     if(m.tag !== letzterT){
       h += '<div class="tag">' + esc(langesDatum(d)) + '</div>';
@@ -282,7 +307,7 @@ function aufbauen(){
     h += '<div class="zeile ' + (eigen?"eigen":"") + '">' +
            '<div class="kuerzel">' + k + '</div>' +
            '<div class="blase">' + inhalt +
-             '<div class="stempel">' + k + ' &middot; ' + kurzDatum(d) + ', ' + esc(m.zeit) + ' Uhr</div>' +
+             '<div class="stempel">' + k + ' &middot; ' + stempelDatum(d) + ' ' + esc(m.zeit) + ' Uhr</div>' +
            '</div></div>';
   });
 

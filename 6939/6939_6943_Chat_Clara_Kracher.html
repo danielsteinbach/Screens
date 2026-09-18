@@ -192,6 +192,7 @@ body{
 
   <div class="menue" id="menue">
     <button id="vollbild">Vollbild</button>
+    <button id="homebildschirm" hidden>Ohne Safari-Leisten öffnen</button>
     <div class="trennlinie"></div>
     <a id="zurStartseite" href="#">Startseite, Einstellungen</a>
   </div>
@@ -510,10 +511,16 @@ function imVollbild(){
 }
 function vollbildBeschriften(){
   const k = document.getElementById("vollbild");
+  const h = document.getElementById("homebildschirm");
   if(!k) return;
-  if(OHNE_LEISTEN){ k.hidden = true; return; }      /* laeuft schon randlos */
-  if(APFEL){ k.textContent = "Ohne Safari-Leisten öffnen"; return; }
+  if(OHNE_LEISTEN){                                  /* laeuft schon randlos */
+    k.hidden = true; if(h) h.hidden = true; return;
+  }
+  k.hidden = false;
   k.textContent = imVollbild() ? "Vollbild beenden" : "Vollbild";
+  /* Auf Apple-Geraeten steht zusaetzlich der Weg ohne Safari-Kreuz
+     zur Wahl. Am Rechner braucht es diesen Eintrag nicht. */
+  if(h) h.hidden = !APFEL;
 }
 function homeBildschirmZeigen(){
   wink('<b>So wird der Schirm wirklich randlos</b>' +
@@ -525,7 +532,6 @@ function homeBildschirmZeigen(){
 }
 function vollbildUmschalten(){
   if(OHNE_LEISTEN) return;
-  if(APFEL){ homeBildschirmZeigen(); return; }
   const e = document.documentElement;
   try{
     if(imVollbild()){
@@ -543,6 +549,10 @@ function vollbildUmschalten(){
 document.getElementById("vollbild").addEventListener("click", () => {
   menueZu();
   vollbildUmschalten();
+});
+document.getElementById("homebildschirm").addEventListener("click", () => {
+  menueZu();
+  homeBildschirmZeigen();
 });
 document.addEventListener("fullscreenchange", vollbildBeschriften);
 document.addEventListener("webkitfullscreenchange", vollbildBeschriften);

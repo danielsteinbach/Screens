@@ -85,6 +85,9 @@ table.daten td.c{width:36mm;font-weight:600;padding:1.1mm 3mm 1.1mm 8mm}
   box-shadow:0 2px 8px rgba(0,0,0,.4);
 }
 .drucken:hover{background:#000}
+/* Nur in der Vorschau aus der Startseite heraus zu sehen. */
+.drucken.zurueck{right:106px;background:#fff;color:#1d1d1d;border:1px solid #c9c5bf}
+.drucken.zurueck:hover{background:#f1efec}
 @media print{
   html,body{background:#fff}
   .blatt{width:auto;min-height:0;margin:0;padding:0;box-shadow:none}
@@ -94,6 +97,7 @@ table.daten td.c{width:36mm;font-weight:600;padding:1.1mm 3mm 1.1mm 8mm}
 </head>
 <body>
 <button class="drucken" onclick="window.print()">Drucken</button>
+<button class="drucken zurueck" id="zurueck" hidden>&#8592; Zur&uuml;ck</button>
 <div class="blatt" id="blatt"></div>
 <script>
 /*__DATEN-ANFANG__*/
@@ -379,6 +383,15 @@ function seitenTeilen(){
 
 aufbauen();
 seitenTeilen();
+
+/* Kommt die Seite aus der Vorschau der Startseite, gibt es keinen
+   Dateinamen zum Zurueckgehen - dann einen Schritt in der
+   Verlaufsliste zurueck. */
+if((location.protocol === "blob:" || location.protocol === "data:") && history.length > 1){
+  const z = document.getElementById("zurueck");
+  z.hidden = false;
+  z.addEventListener("click", () => history.back());
+}
 </script>
 </body>
 </html>

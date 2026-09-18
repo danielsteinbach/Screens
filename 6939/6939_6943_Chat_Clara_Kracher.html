@@ -62,11 +62,21 @@ body{
 /* kurzer Hinweis am unteren Rand */
 .wink{
   position:absolute;left:50%;bottom:86px;transform:translateX(-50%) translateY(14px);
-  background:rgba(20,26,24,.93);color:#fff;border-radius:9px;
-  padding:12px 17px;font-size:14.5px;line-height:1.4;max-width:86%;
+  background:rgba(20,26,24,.94);color:#fff;border-radius:11px;
+  padding:16px 19px 14px;font-size:14.5px;line-height:1.45;
+  width:min(480px,86%);text-align:left;
   opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:40;
 }
 .wink.da{opacity:1;transform:translateX(-50%) translateY(0)}
+.wink.bleibt{pointer-events:auto}
+.wink b{display:block;margin-bottom:6px;font-size:15px}
+.wink ol{margin:8px 0 0;padding-left:20px}
+.wink li{margin:3px 0}
+.wink .zu{
+  display:block;margin:13px 0 0 auto;background:#ffffff;color:#141a18;
+  border:0;border-radius:7px;padding:8px 16px;font:inherit;font-weight:600;
+  font-size:14px;cursor:pointer;
+}
 /* ---------- Kopfleiste ---------- */
 .kopf{
   flex:0 0 auto;display:flex;align-items:center;gap:12px;
@@ -462,32 +472,60 @@ document.getElementById("punkte").addEventListener("click", e => {
 MENUE.addEventListener("click", e => e.stopPropagation());
 document.addEventListener("click", menueZu);
 
-/* kurzer Hinweis unten */
+/* Hinweis am unteren Rand. Kurz, oder mit "bleibt" stehend, bis
+   jemand ihn wegtippt. */
 let winkUhr = null;
-function wink(t){
+function wink(html, bleibt){
   const w = document.getElementById("wink");
-  w.textContent = t;
+  w.innerHTML = html + (bleibt ? '<button class="zu" id="winkZu">Verstanden</button>' : "");
   w.classList.add("da");
+  w.classList.toggle("bleibt", !!bleibt);
   clearTimeout(winkUhr);
-  winkUhr = setTimeout(() => w.classList.remove("da"), 5200);
+  if(bleibt){
+    const k = document.getElementById("winkZu");
+    k.addEventListener("click", e => {
+      e.stopPropagation();
+      w.classList.remove("da","bleibt");
+    });
+  }else{
+    winkUhr = setTimeout(() => w.classList.remove("da"), 5200);
+  }
 }
 
-/* ---------- Vollbild ----------
-   Auf dem iPad haengt es von der Safari-Fassung ab, ob das geht.
-   Klappt es nicht, steht der zuverlaessige Weg im Hinweis:
-   ueber "Zum Home-Bildschirm" startet die Seite ohne Safari-Leisten. */
+/* ------------------------------------------------------------------
+   Vollbild.
+   Auf iPad und iPhone blendet Safari beim Vollbild ein eigenes Kreuz
+   zum Beenden ein. Das gehoert dem Browser, eine Seite kann es nicht
+   wegblenden - auf dem Bild waere es zu sehen. Darum wird dort statt
+   des Vollbilds der saubere Weg gezeigt: ueber "Zum Home-Bildschirm"
+   startet die Seite ganz ohne Leisten und ohne Kreuz.
+   ------------------------------------------------------------------ */
+const APFEL = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const OHNE_LEISTEN = (navigator.standalone === true) ||
+              (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+
 function imVollbild(){
   return !!(document.fullscreenElement || document.webkitFullscreenElement);
 }
 function vollbildBeschriften(){
   const k = document.getElementById("vollbild");
-  if(k) k.textContent = imVollbild() ? "Vollbild beenden" : "Vollbild";
+  if(!k) return;
+  if(OHNE_LEISTEN){ k.hidden = true; return; }      /* laeuft schon randlos */
+  if(APFEL){ k.textContent = "Ohne Safari-Leisten öffnen"; return; }
+  k.textContent = imVollbild() ? "Vollbild beenden" : "Vollbild";
 }
-function vollbildHinweis(){
-  wink("Vollbild geht in diesem Browser nicht. Auf dem iPad: Teilen-Symbol, "
-     + "dann „Zum Home-Bildschirm“ – von dort startet die Seite ohne Safari-Leisten.");
+function homeBildschirmZeigen(){
+  wink('<b>So wird der Schirm wirklich randlos</b>' +
+       'Safari zeigt im Vollbild immer ein Kreuz zum Beenden. Das lässt sich ' +
+       'nicht wegblenden. Ohne Kreuz geht es so:' +
+       '<ol><li>unten in Safari auf das Teilen-Symbol</li>' +
+       '<li>&bdquo;Zum Home-Bildschirm&ldquo; wählen</li>' +
+       '<li>die Seite künftig über dieses Symbol starten</li></ol>', true);
 }
 function vollbildUmschalten(){
+  if(OHNE_LEISTEN) return;
+  if(APFEL){ homeBildschirmZeigen(); return; }
   const e = document.documentElement;
   try{
     if(imVollbild()){
@@ -495,11 +533,11 @@ function vollbildUmschalten(){
       if(aus) aus.call(document);
     }else{
       const ein = e.requestFullscreen || e.webkitRequestFullscreen;
-      if(!ein){ vollbildHinweis(); return; }
+      if(!ein){ homeBildschirmZeigen(); return; }
       const p = ein.call(e);
-      if(p && p.catch) p.catch(vollbildHinweis);
+      if(p && p.catch) p.catch(homeBildschirmZeigen);
     }
-  }catch(x){ vollbildHinweis(); }
+  }catch(x){ homeBildschirmZeigen(); }
   setTimeout(vollbildBeschriften, 350);
 }
 document.getElementById("vollbild").addEventListener("click", () => {
@@ -508,14 +546,30 @@ document.getElementById("vollbild").addEventListener("click", () => {
 });
 document.addEventListener("fullscreenchange", vollbildBeschriften);
 document.addEventListener("webkitfullscreenchange", vollbildBeschriften);
+vollbildBeschriften();
 
-/* ---------- Weg zurueck zur Startseite ----------
-   Online heisst sie index.html, in der Dropbox Index_Chat_bearbeiten.html.
-   Liegt sie woanders, hier den Namen eintragen. */
+/* ------------------------------------------------------------------
+   Weg zurueck zur Startseite.
+   Aus der Vorschau heraus (die Startseite hat die Ansicht im selben
+   Tab geoeffnet) gibt es keinen Dateinamen, auf den ein Link zeigen
+   koennte - dort geht es einen Schritt in der Verlaufsliste zurueck.
+   Sonst: online index.html, am eigenen Rechner
+   Index_Chat_bearbeiten.html. Liegt sie woanders, hier eintragen.
+   ------------------------------------------------------------------ */
+const AUS_VORSCHAU = (location.protocol === "blob:" || location.protocol === "data:");
 const STARTSEITE = (location.protocol === "file:")
   ? "Index_Chat_bearbeiten.html"
   : "index.html";
-document.getElementById("zurStartseite").setAttribute("href", STARTSEITE);
+
+const ZURUECK = document.getElementById("zurStartseite");
+ZURUECK.setAttribute("href", AUS_VORSCHAU ? "#" : STARTSEITE);
+ZURUECK.addEventListener("click", e => {
+  if(!AUS_VORSCHAU) return;
+  e.preventDefault();
+  menueZu();
+  if(history.length > 1) history.back();
+  else wink("Dieses Fenster wurde direkt geöffnet, es gibt keinen Weg zurück.");
+});
 
 /* ---------- Sprachnachricht ---------- */
 let tonLaeuft = null;

@@ -193,6 +193,7 @@ body{
   <div class="menue" id="menue">
     <button id="vollbild">Vollbild</button>
     <button id="homebildschirm" hidden>Ohne Safari-Leisten öffnen</button>
+    <button id="alsBild">Als Bild speichern</button>
     <div class="trennlinie"></div>
     <a id="zurStartseite" href="#">Startseite, Einstellungen</a>
   </div>
@@ -631,6 +632,271 @@ setTimeout(ansEnde, 400);
 const tk = document.getElementById("tonKnopf");
 if(tk) tk.addEventListener("click", tonStarten);
 if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
+
+/* ============================================================================
+   CHAT ALS BILD SICHERN
+   ----------------------------------------------------------------------------
+   Erzeugt aus dem ganzen Verlauf ein einzelnes PNG:
+       Breite = 820 Punkte, also ein iPad im Hochformat,
+       Hoehe  = so lang, wie der Verlauf es verlangt.
+   Gezeichnet wird mit doppelter Aufloesung, das Bild ist also 1640 Punkte
+   breit. In der Fotos-App laesst es sich dann auf Bildschirmbreite ziehen
+   und von oben nach unten wischen - ohne Browser, ohne Leisten, ohne Kreuz.
+
+   Ablauf, wie bei den anderen Requisiten dieser Reihe:
+     1. Stylesheet der Seite einsammeln, @media fuer genau diese Breite
+        aufloesen und auf den Kopierknoten begrenzen
+     2. Kopie der Seite in voller Laenge unsichtbar aufbauen und messen
+     3. Bilder in Datenadressen umwandeln, damit sie mitgezeichnet werden
+     4. alles in ein SVG mit foreignObject legen, auf Leinwand zeichnen, PNG
+   ========================================================================== */
+(function(){
+
+  var ZIEL = ".app";
+  var NAME = "Chat_Clara_Kracher";
+  var BREITE = 820;                 /* Punkte, iPad im Hochformat */
+  var SCHAERFE = 2;                 /* doppelte Aufloesung        */
+  var MAXKANTE = 12000, MAXPIXEL = 16000000;
+
+  /* Zusatzregeln, nur fuer die Kopie: alles aufklappen, nichts abschneiden,
+     Menue und Hinweis weglassen. */
+  var EXTRA =
+    "\n.szexp{ box-sizing:border-box; margin:0; padding:0; height:auto !important;" +
+    " min-height:0 !important; max-height:none !important; overflow:visible !important;" +
+    " display:block !important; }" +
+    "\n.szexp *{ animation:none !important; transition:none !important; }" +
+    "\n.szexp .app{ height:auto !important; min-height:0 !important; overflow:visible !important;" +
+    " box-shadow:none !important; }" +
+    "\n.szexp .verlauf{ overflow:visible !important; height:auto !important;" +
+    " max-height:none !important; flex:0 0 auto !important; }" +
+    "\n.szexp .menue, .szexp .wink{ display:none !important; }\n";
+
+  /* --- Stylesheet aufbereiten ------------------------------------------- */
+  function passend(t, start){
+    var tiefe = 0;
+    for(var j = start; j < t.length; j++){
+      var c = t.charAt(j);
+      if(c === "{") tiefe++;
+      else if(c === "}"){ tiefe--; if(tiefe === 0) return j; }
+    }
+    return t.length - 1;
+  }
+  function medienTest(frage, B, H){
+    var oder = frage.split(",");
+    for(var i = 0; i < oder.length; i++){
+      var teile = oder[i].split(/\band\b/), alle = true;
+      for(var j = 0; j < teile.length; j++){
+        var t = teile[j].trim().replace(/^\(/, "").replace(/\)$/, "").trim();
+        if(!t) continue;
+        var p = t.split(":"), k = p[0].trim().toLowerCase(), v = (p[1] || "").trim().toLowerCase();
+        if(k === "max-width")        alle = alle && (B <= parseFloat(v));
+        else if(k === "min-width")   alle = alle && (B >= parseFloat(v));
+        else if(k === "max-height")  alle = alle && (H <= parseFloat(v));
+        else if(k === "min-height")  alle = alle && (H >= parseFloat(v));
+        else if(k === "orientation") alle = alle && (v === "portrait");
+        else if(k === "print")       alle = false;
+        else if(k === "screen" || k === "all"){ /* passt */ }
+      }
+      if(alle) return true;
+    }
+    return false;
+  }
+  /* html, body und :root werden zum Wurzelknoten der Kopie, alles andere
+     bekommt .szexp davor - so wirkt das Stylesheet nur in der Kopie. */
+  function waehlerUmbauen(kopf){
+    var teile = kopf.split(","), neu = [];
+    for(var i = 0; i < teile.length; i++){
+      var s = teile[i].trim();
+      if(!s) continue;
+      if(s === "html" || s === "body" || s === ":root"){ neu.push(".szexp"); continue; }
+      s = (" " + s)
+            .replace(/([^-\w.#\[]):root(?![-\w])/g, "$1")
+            .replace(/([^-\w.#\[])body(?![-\w])/g,  "$1")
+            .replace(/([^-\w.#\[])html(?![-\w])/g,  "$1")
+            .replace(//g, ".szexp").trim();
+      if(s.indexOf(".szexp") !== 0) s = ".szexp " + s;
+      neu.push(s);
+    }
+    return neu.join(",");
+  }
+  function bearbeiten(css, B, H){
+    var aus = "", i = 0;
+    while(i < css.length){
+      var auf = css.indexOf("{", i);
+      if(auf < 0) break;
+      var kopf = css.slice(i, auf).trim();
+      var zu = passend(css, auf);
+      var rumpf = css.slice(auf + 1, zu);
+      if(kopf.charAt(0) === "@"){
+        var art = kopf.slice(1).split(/[\s({]/)[0].toLowerCase();
+        if(art === "media"){
+          if(medienTest(kopf.slice(kopf.indexOf("media") + 5), B, H)) aus += bearbeiten(rumpf, B, H);
+        } else if(art === "supports"){
+          aus += bearbeiten(rumpf, B, H);
+        } else {
+          aus += kopf + "{" + rumpf + "}";
+        }
+      } else {
+        aus += waehlerUmbauen(kopf) + "{" + rumpf + "}";
+      }
+      i = zu + 1;
+    }
+    return aus;
+  }
+  function cssSammeln(B, H){
+    var roh = "", stile = document.querySelectorAll("style");
+    for(var i = 0; i < stile.length; i++) roh += stile[i].textContent + "\n";
+    roh = roh.replace(/\/\*[\s\S]*?\*\//g, "");
+    return bearbeiten(roh, B, H) + "\n" + EXTRA;
+  }
+
+  /* --- Kopie der Seite --------------------------------------------------- */
+  function klonBauen(B){
+    var wrap = document.createElement("div");
+    wrap.className = "szexp";
+    var cs = getComputedStyle(document.body);
+    var hg = cs.backgroundColor;
+    if(!hg || hg === "transparent" || hg === "rgba(0, 0, 0, 0)") hg = "#ffffff";
+    wrap.setAttribute("style",
+      "width:" + B + "px; margin:0; padding:0; position:relative; overflow:visible;" +
+      "background:" + hg + "; color:" + cs.color + "; font-family:" + cs.fontFamily + ";");
+
+    var kopie = document.querySelector(ZIEL).cloneNode(true);
+    /* Menue und Hinweis gehoeren nicht ins Bild */
+    var weg = kopie.querySelectorAll(".menue, .wink");
+    for(var i = 0; i < weg.length; i++) weg[i].parentNode.removeChild(weg[i]);
+    wrap.appendChild(kopie);
+    return { wrap: wrap, hg: hg };
+  }
+
+  /* --- Bilder einbetten --------------------------------------------------
+     Die Profilbilder sind schon Datenadressen. Ein Chatfoto, das als Datei
+     neben der Seite liegt, wird hier umgewandelt. Geht das nicht - bei einer
+     Datei am eigenen Rechner sperrt der Browser das -, tritt an seine Stelle
+     wieder die graue Platzhalterflaeche.                                   */
+  function bilderEinbetten(klon, fertig){
+    var bilder = klon.querySelectorAll("img"), offen = bilder.length;
+    if(!offen){ fertig(); return; }
+    var ab = function(){ if(--offen === 0) fertig(); };
+    for(var n = 0; n < bilder.length; n++){
+      (function(b){
+        var src = b.getAttribute("src") || "";
+        if(!src || src.indexOf("data:") === 0){ ab(); return; }
+        var q = new Image();
+        q.onload = function(){
+          try{
+            var c = document.createElement("canvas");
+            c.width = q.naturalWidth; c.height = q.naturalHeight;
+            c.getContext("2d").drawImage(q, 0, 0);
+            var gross = q.naturalWidth * q.naturalHeight > 400000;
+            b.setAttribute("src", c.toDataURL(gross ? "image/jpeg" : "image/png", 0.9));
+          }catch(e){ platzhalterZurueck(b); }
+          ab();
+        };
+        q.onerror = function(){ platzhalterZurueck(b); ab(); };
+        q.src = src;
+      })(bilder[n]);
+    }
+  }
+  function platzhalterZurueck(b){
+    var a = b.closest ? b.closest(".anhang") : null;
+    if(a){
+      a.innerHTML =
+        '<div class="flaeche">' +
+        '<svg viewBox="0 0 24 24"><path d="M9 3h6l1.5 2H20a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h3.5L9 3zm3 4.5A4.5 4.5 0 1 0 12 16.5 4.5 4.5 0 0 0 12 7.5zm0 2A2.5 2.5 0 1 1 12 14.5 2.5 2.5 0 0 1 12 9.5z"/></svg>' +
+        '<b>Foto</b><small>' + (DATEN.bildname || "") + '</small></div>';
+    } else if(b.parentNode){
+      b.parentNode.removeChild(b);
+    }
+  }
+
+  /* --- Hauptablauf ------------------------------------------------------- */
+  function erzeugen(nachher){
+    var B = BREITE;
+    var css = cssSammeln(B, 1180);
+    var g = klonBauen(B), klon = g.wrap;
+
+    var buehne = document.createElement("div");
+    buehne.setAttribute("style",
+      "position:fixed; left:-30000px; top:0; width:" + B + "px; z-index:-1;" +
+      "pointer-events:none; opacity:0;");
+    var stil = document.createElement("style");
+    stil.textContent = css;
+    buehne.appendChild(stil);
+    buehne.appendChild(klon);
+    document.body.appendChild(buehne);
+
+    var aufraeumen = function(){
+      if(buehne.parentNode) buehne.parentNode.removeChild(buehne);
+    };
+
+    bilderEinbetten(klon, function(){
+      var hoeheCss = Math.ceil(klon.getBoundingClientRect().height);
+      if(!hoeheCss){ aufraeumen(); nachher(null); return; }
+
+      var k = SCHAERFE;
+      var W = Math.round(B * k), H = Math.round(hoeheCss * k);
+      var f = Math.min(1, MAXKANTE / W, MAXKANTE / H, Math.sqrt(MAXPIXEL / (W * H)));
+      if(f < 1){ k = k * f; W = Math.round(B * k); H = Math.round(hoeheCss * k); }
+
+      var inhalt;
+      try{
+        klon.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        inhalt = new XMLSerializer().serializeToString(klon);
+      }catch(e){ aufraeumen(); nachher(null); return; }
+
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H +
+                '" viewBox="0 0 ' + W + ' ' + H + '">' +
+                '<rect width="100%" height="100%" fill="' + g.hg + '"/>' +
+                '<foreignObject x="0" y="0" width="' + W + '" height="' + H + '">' +
+                '<div xmlns="http://www.w3.org/1999/xhtml" style="transform:scale(' + k +
+                ');transform-origin:0 0;width:' + B + 'px;height:' + hoeheCss + 'px;">' +
+                '<style><![CDATA[' + css + ']]></style>' + inhalt +
+                '</div></foreignObject></svg>';
+
+      var img = new Image();
+      img.onload = function(){
+        var c = document.createElement("canvas");
+        c.width = W; c.height = H;
+        var ctx = c.getContext("2d");
+        ctx.fillStyle = g.hg; ctx.fillRect(0, 0, W, H);
+        ctx.drawImage(img, 0, 0, W, H);
+        aufraeumen();
+        var name = (NAME + "_" + W + "x" + H + ".png").replace(/[^A-Za-z0-9_.-]/g, "");
+        if(c.toBlob) c.toBlob(function(b){ nachher({blob:b, name:name, W:W, H:H}); }, "image/png");
+        else {
+          var d = c.toDataURL("image/png");
+          var bin = atob(d.split(",")[1]), arr = new Uint8Array(bin.length);
+          for(var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+          nachher({blob:new Blob([arr], {type:"image/png"}), name:name, W:W, H:H});
+        }
+      };
+      img.onerror = function(){ aufraeumen(); nachher(null); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    });
+  }
+
+  /* Von aussen erreichbar, damit die Pruefung es aufrufen kann. */
+  window.bildErzeugen = erzeugen;
+
+  document.getElementById("alsBild").addEventListener("click", function(){
+    menueZu();
+    wink("Das Bild wird erzeugt …");
+    setTimeout(function(){
+      erzeugen(function(e){
+        if(!e){ wink("Das Bild konnte nicht erzeugt werden."); return; }
+        var url = URL.createObjectURL(e.blob);
+        var a = document.createElement("a");
+        a.href = url; a.download = e.name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+        wink('<b>Bild gespeichert</b>' + e.W + " × " + e.H + " Punkte · " +
+             Math.round(e.blob.size / 1024) + " KB<br>" + e.name, true);
+      });
+    }, 60);
+  });
+
+})();
 
 /* Tasten:  B  eigenes Foto vom Geraet    0  Foto wieder vergessen
             F  Vollbild                  Esc  Menue zu                */

@@ -637,11 +637,15 @@ if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
    CHAT ALS BILD SICHERN
    ----------------------------------------------------------------------------
    Erzeugt aus dem ganzen Verlauf ein einzelnes PNG:
-       Breite = 820 Punkte, also ein iPad im Hochformat,
+       Breite = Bildschirmbreite des benutzten Geraetes, in echten Pixeln,
        Hoehe  = so lang, wie der Verlauf es verlangt.
-   Gezeichnet wird mit doppelter Aufloesung, das Bild ist also 1640 Punkte
-   breit. In der Fotos-App laesst es sich dann auf Bildschirmbreite ziehen
-   und von oben nach unten wischen - ohne Browser, ohne Leisten, ohne Kreuz.
+   Das Bild ist damit genau so breit, wie das Geraet es kann - ein grosses
+   iPad gibt ein breiteres Bild als ein kleines. Hoch- und Querformat werden
+   getrennt behandelt: die Breitenangaben der Seite (@media) werden vor dem
+   Zeichnen fuer genau diese Breite und Ausrichtung aufgeloest, damit das
+   Bild aussieht wie der Bildschirm. In der Fotos-App laesst es sich dann
+   auf Bildschirmbreite ziehen und von oben nach unten wischen - ohne
+   Browser, ohne Leisten, ohne Kreuz.
 
    Ablauf, wie bei den anderen Requisiten dieser Reihe:
      1. Stylesheet der Seite einsammeln, @media fuer genau diese Breite
@@ -654,9 +658,19 @@ if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
 
   var ZIEL = ".app";
   var NAME = "Chat_Clara_Kracher";
-  var BREITE = 820;                 /* Punkte, iPad im Hochformat */
-  var SCHAERFE = 2;                 /* doppelte Aufloesung        */
   var MAXKANTE = 12000, MAXPIXEL = 16000000;
+
+  /* --- Masse des Geraetebildschirms ---------------------------------------
+     screen.* liefert unter iOS immer die Masse im Hochformat, auch wenn das
+     Geraet quer gehalten wird. Darum wird die Ausrichtung am Fenster
+     abgelesen und die beiden Werte notfalls getauscht. */
+  function masse(){
+    var dpr  = window.devicePixelRatio || 1;
+    var kurz = Math.min(screen.width, screen.height);
+    var lang = Math.max(screen.width, screen.height);
+    var quer = window.innerWidth > window.innerHeight;
+    return { breite: quer ? lang : kurz, hoehe: quer ? kurz : lang, dpr: dpr, quer: quer };
+  }
 
   /* Zusatzregeln, nur fuer die Kopie: alles aufklappen, nichts abschneiden,
      Menue und Hinweis weglassen. */
@@ -681,7 +695,7 @@ if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
     }
     return t.length - 1;
   }
-  function medienTest(frage, B, H){
+  function medienTest(frage, B, H, quer){
     var oder = frage.split(",");
     for(var i = 0; i < oder.length; i++){
       var teile = oder[i].split(/\band\b/), alle = true;
@@ -693,7 +707,7 @@ if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
         else if(k === "min-width")   alle = alle && (B >= parseFloat(v));
         else if(k === "max-height")  alle = alle && (H <= parseFloat(v));
         else if(k === "min-height")  alle = alle && (H >= parseFloat(v));
-        else if(k === "orientation") alle = alle && (v === "portrait");
+        else if(k === "orientation") alle = alle && (v === (quer ? "landscape" : "portrait"));
         else if(k === "print")       alle = false;
         else if(k === "screen" || k === "all"){ /* passt */ }
       }
@@ -719,7 +733,7 @@ if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
     }
     return neu.join(",");
   }
-  function bearbeiten(css, B, H){
+  function bearbeiten(css, B, H, quer){
     var aus = "", i = 0;
     while(i < css.length){
       var auf = css.indexOf("{", i);
@@ -730,9 +744,10 @@ if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
       if(kopf.charAt(0) === "@"){
         var art = kopf.slice(1).split(/[\s({]/)[0].toLowerCase();
         if(art === "media"){
-          if(medienTest(kopf.slice(kopf.indexOf("media") + 5), B, H)) aus += bearbeiten(rumpf, B, H);
+          if(medienTest(kopf.slice(kopf.indexOf("media") + 5), B, H, quer))
+            aus += bearbeiten(rumpf, B, H, quer);
         } else if(art === "supports"){
-          aus += bearbeiten(rumpf, B, H);
+          aus += bearbeiten(rumpf, B, H, quer);
         } else {
           aus += kopf + "{" + rumpf + "}";
         }
@@ -743,11 +758,11 @@ if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
     }
     return aus;
   }
-  function cssSammeln(B, H){
+  function cssSammeln(B, H, quer){
     var roh = "", stile = document.querySelectorAll("style");
     for(var i = 0; i < stile.length; i++) roh += stile[i].textContent + "\n";
     roh = roh.replace(/\/\*[\s\S]*?\*\//g, "");
-    return bearbeiten(roh, B, H) + "\n" + EXTRA;
+    return bearbeiten(roh, B, H, quer) + "\n" + EXTRA;
   }
 
   /* --- Kopie der Seite --------------------------------------------------- */
@@ -812,8 +827,8 @@ if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
 
   /* --- Hauptablauf ------------------------------------------------------- */
   function erzeugen(nachher){
-    var B = BREITE;
-    var css = cssSammeln(B, 1180);
+    var m = masse(), B = m.breite;
+    var css = cssSammeln(B, m.hoehe, m.quer);
     var g = klonBauen(B), klon = g.wrap;
 
     var buehne = document.createElement("div");
@@ -834,7 +849,7 @@ if(DATEN.bild) bildSetzen(DATEN.bild); else dateiSuchen(0);
       var hoeheCss = Math.ceil(klon.getBoundingClientRect().height);
       if(!hoeheCss){ aufraeumen(); nachher(null); return; }
 
-      var k = SCHAERFE;
+      var k = m.dpr;                  /* echte Bildpunkte des Geraetes */
       var W = Math.round(B * k), H = Math.round(hoeheCss * k);
       var f = Math.min(1, MAXKANTE / W, MAXKANTE / H, Math.sqrt(MAXPIXEL / (W * H)));
       if(f < 1){ k = k * f; W = Math.round(B * k); H = Math.round(hoeheCss * k); }

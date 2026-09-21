@@ -510,23 +510,23 @@ const CONFIG = {
   shareBase: "https://karten.example/#map=",
 
   // Start-Ansicht: Mittelpunkt in Bildpixeln + Zoom (1 = Originalgröße, "fit" = ganze Karte)
-  startCenter: [1376, 1376],
+  startCenter: [1460, 3020],
   startZoom: "fit",
+  // Startansicht so wählen, dass dieser Bereich (Bildpixel x1,y1,x2,y2) sichtbar ist – z.B. die ganze Route
+  startBounds: [820, 1900, 2100, 4150],
   maxZoom: 2,
 
   // Maßstab: wie viele Meter entspricht 1 Bildpixel (bei Zoom 1)?
-  // -> Strecke mit bekannter Länge im Bild messen: Meter / Pixel
-  metersPerPixel: 20,
+  metersPerPixel: 11,
 
-  // Optional: Marker, die über dem Bild liegen (Bildpixel). Leer lassen, wenn im JPG schon drin.
-  // type: "start" | "via" | "end"
+  // Marker über dem Bild (Bildpixel). type: "start" | "via" | "end"
   markers: [
-    // { x: 820,  y: 540,  type: "start" },
-    // { x: 1400, y: 1500, type: "via"   },
-    // { x: 1900, y: 2200, type: "end"   },
+    { x: 1905, y: 2035, type: "start" },   // Ottensheim
+    { x: 1850, y: 3110, type: "via"   },   // Hörsching
+    { x:  975, y: 4005, type: "end"   },   // Thalheim bei Wels
   ],
   // Blauer "Standort"-Punkt (Bildpixel) oder null
-  myLocation: null,             // z.B. [820, 540]
+  myLocation: null,             // z.B. [1905, 2035]
 
   attribution: "Kartendaten © 2026",
 
@@ -538,32 +538,33 @@ const CONFIG = {
 
   // Verkehrsmittel – Zeiten pro Modus
   modes: [
-    { id: "car",  label: "Auto",    time: "43 Min.",        dist: "41 km", note: "Schnellste Route bei aktueller Verkehrslage" },
-    { id: "bus",  label: "Öffis",   time: "1 Std. 38 Min.", dist: "",      note: "2 Umstiege · ab 08:12" },
-    { id: "walk", label: "Zu Fuß",  time: "8 Std. 20 Min.", dist: "39 km", note: "Überwiegend flach" },
-    { id: "bike", label: "Rad",     time: "2 Std. 25 Min.", dist: "40 km", note: "Größtenteils Radwege und ruhige Straßen" },
+    { id: "car",  label: "Auto",    time: "38 Min.",        dist: "32 km", note: "Schnellste Route · enthält eine Fähre" },
+    { id: "bus",  label: "Öffis",   time: "1 Std. 34 Min.", dist: "",      note: "2 Umstiege · ab 08:12" },
+    { id: "walk", label: "Zu Fuß",  time: "6 Std. 40 Min.", dist: "31 km", note: "Mit der Donaufähre, überwiegend flach" },
+    { id: "bike", label: "Rad",     time: "1 Std. 55 Min.", dist: "32 km", note: "Größtenteils Radwege und ruhige Straßen" },
   ],
 
   // Routenvarianten (nur für Auto)
   alternatives: [
-    { via: "über B127 und B1",    info: "Schnellste Route, normale Verkehrslage", time: "43 Min.", dist: "41 km" },
-    { via: "über A7 und A1",      info: "Enthält Mautstraßen (Vignette)",         time: "47 Min.", dist: "49 km", slow: true },
-    { via: "über B129 Wilhering", info: "Landstraße",                             time: "51 Min.", dist: "38 km", slow: true },
+    { via: "über Donaufähre und Kirchberg-Thening", info: "Schnellste Route · enthält eine Fähre", time: "38 Min.", dist: "32 km" },
+    { via: "über Linz und B1",                      info: "Ohne Fähre, dichter Verkehr in Linz",  time: "44 Min.", dist: "41 km", slow: true },
+    { via: "über A7 und A25",                       info: "Enthält Mautstraßen (Vignette)",       time: "46 Min.", dist: "49 km", slow: true },
   ],
 
-  // Wegbeschreibung. icon: straight | left | right | slight-left | slight-right | roundabout | pin | flag
+  // Wegbeschreibung. icon: straight | left | right | slight-left | slight-right | roundabout | ferry | pin | flag
   steps: [
-    { icon: "pin",          text: "Ottensheim",                                 wp: true },
-    { icon: "straight",     text: "Auf B127 Rohrbacher Straße Richtung Linz",   dist: "9,6 km" },
-    { icon: "slight-right", text: "Rechts halten, weiter Richtung Linz-Zentrum", dist: "1,2 km" },
-    { icon: "right",        text: "Über die Nibelungenbrücke",                   dist: "0,8 km" },
-    { icon: "right",        text: "Rechts abbiegen auf B1 Wiener Straße Richtung Leonding", dist: "8,4 km" },
-    { icon: "roundabout",   text: "Im Kreisverkehr 2. Ausfahrt nehmen, Richtung Hörsching", dist: "4,1 km" },
-    { icon: "pin",          text: "Hörsching",                                  wp: true },
-    { icon: "straight",     text: "Weiter auf B1 Richtung Marchtrenk / Wels",   dist: "9,7 km" },
-    { icon: "slight-left",  text: "Links halten Richtung Thalheim",             dist: "4,3 km" },
-    { icon: "left",         text: "Links abbiegen, Ziel befindet sich rechts",  dist: "2,9 km" },
-    { icon: "flag",         text: "Thalheim bei Wels",                          wp: true },
+    { icon: "pin",          text: "Ottensheim",                                          wp: true },
+    { icon: "straight",     text: "Richtung Süden zur Donaufähre",                       dist: "0,4 km" },
+    { icon: "ferry",        text: "Mit der Donaufähre nach Wilhering übersetzen",         dist: "0,4 km" },
+    { icon: "straight",     text: "Geradeaus Richtung Schönering",                        dist: "3,2 km" },
+    { icon: "right",        text: "Rechts abbiegen auf B129 Richtung Eferding",           dist: "1,9 km" },
+    { icon: "left",         text: "In Straßham links abbiegen Richtung Kirchberg-Thening", dist: "3,8 km" },
+    { icon: "straight",     text: "Durch Thening, weiter Richtung Hörsching",             dist: "5,7 km" },
+    { icon: "pin",          text: "Hörsching",                                           wp: true },
+    { icon: "slight-right", text: "Auf B1 Richtung Wels, durch Marchtrenk",               dist: "11,6 km" },
+    { icon: "left",         text: "In Wels links abbiegen, über die Traunbrücke",          dist: "3,9 km" },
+    { icon: "straight",     text: "Weiter nach Thalheim, Ziel befindet sich rechts",      dist: "1,2 km" },
+    { icon: "flag",         text: "Thalheim bei Wels",                                   wp: true },
   ],
 };
 
@@ -580,6 +581,7 @@ const ICON = {
   right:         '<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M6 21h2v-8h7.2l-3.6 3.6L13 18l6-6-6-6-1.4 1.4 3.6 3.6H8a2 2 0 0 0-2 2z"/></svg>',
   "slight-left": '<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M14 21h2v-6.2c0-1.1-.4-2.1-1.2-2.8L9.4 6.6H13V4.6H6v7h2V8l5.4 5.4c.4.4.6.9.6 1.4z"/></svg>',
   "slight-right":'<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M10 21H8v-6.2c0-1.1.4-2.1 1.2-2.8l5.4-5.4H11V4.6h7v7h-2V8l-5.4 5.4c-.4.4-.6.9-.6 1.4z"/></svg>',
+  ferry:         '<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.34-.42-.6-.5L20 10.62V6c0-1.1-.9-2-2-2h-3V1H9v3H6c-1.1 0-2 .9-2 2v4.62l-1.29.42c-.26.08-.48.26-.6.5s-.15.52-.06.78L3.95 19zM6 6h12v3.97L12 8 6 9.97V6z"/></svg>',
   roundabout:    '<svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" d="M11 14h2v8h-2zM15.5 6.5l3-3M18.5 3.5V7h-3.5" stroke="currentColor" stroke-width="2"/></svg>',
   pin:           '<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>',
   flag:          '<svg width="22" height="22" viewBox="0 0 24 24"><path fill="#d93025" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>',
@@ -661,13 +663,26 @@ const map = $("map"), layer = $("mapLayer");
 let [W, H] = CONFIG.imageSize;
 let scale = 1, tx = 0, ty = 0, minScale = 0.1;
 
-function fitScale(){ return Math.max(innerWidth/W, innerHeight/H); }  // Bild füllt immer den Bildschirm
+// Bereich, den das Kartenbild mindestens füllen muss: Bildschirm ohne die deckenden Bedienflächen
+function clampArea(){
+  const hide = document.body.classList.contains("hide-ui");
+  if(!hide && innerWidth>=760 && !document.body.classList.contains("panel-hidden")){
+    const pw = ($("sheet") && $("sheet").offsetWidth) || 0; return {x0: pw, y0: 0, x1: innerWidth, y1: innerHeight};
+  }
+  if(!hide && innerWidth<760){
+    const top = ($("dirCard") && $("dirCard").offsetHeight) || 0;
+    return {x0: 0, y0: Math.max(0, top - 16), x1: innerWidth, y1: innerHeight - 168 + 16};
+  }
+  return {x0: 0, y0: 0, x1: innerWidth, y1: innerHeight};
+}
+function fitScale(){ const a = clampArea(); return Math.max((a.x1-a.x0)/W, (a.y1-a.y0)/H); }
 function clamp(){
+  const a = clampArea();
   minScale = fitScale();
   scale = Math.min(Math.max(scale, minScale), CONFIG.maxZoom);
-  const w = W*scale, h = H*scale;
-  tx = w <= innerWidth  ? (innerWidth-w)/2  : Math.min(0, Math.max(innerWidth-w, tx));
-  ty = h <= innerHeight ? (innerHeight-h)/2 : Math.min(0, Math.max(innerHeight-h, ty));
+  const w = W*scale, h = H*scale, aw = a.x1-a.x0, ah = a.y1-a.y0;
+  tx = w <= aw ? a.x0+(aw-w)/2 : Math.min(a.x0, Math.max(a.x1-w, tx));
+  ty = h <= ah ? a.y0+(ah-h)/2 : Math.min(a.y0, Math.max(a.y1-h, ty));
 }
 function render(){
   clamp();
@@ -761,12 +776,28 @@ map.addEventListener("wheel", e=>{
 // iOS Safari: Seiten-Zoom unterbinden
 ["gesturestart","gesturechange"].forEach(t=>document.addEventListener(t, e=>e.preventDefault()));
 
-function viewCenter(){
-  // Mittelpunkt des sichtbaren Kartenbereichs (neben der Seitenleiste bzw. zwischen Karte oben/unten)
-  if(innerWidth>=760 && !document.body.classList.contains("panel-hidden")){
-    const pw = $("sheet").offsetWidth; return {x: pw + (innerWidth-pw)/2, y: innerHeight/2};
+function viewArea(){
+  // sichtbarer Kartenbereich (ohne Seitenleiste bzw. ohne Routenkarte oben / Übersicht unten)
+  const hide = document.body.classList.contains("hide-ui");
+  if(!hide && innerWidth>=760 && !document.body.classList.contains("panel-hidden")){
+    const pw = $("sheet").offsetWidth; return {x0: pw, y0: 0, x1: innerWidth - 60, y1: innerHeight};
   }
-  return {x: innerWidth/2, y: innerHeight/2};
+  if(!hide && innerWidth<760){
+    const top = $("dirCard").offsetHeight, bot = innerHeight - $("sheet").offsetHeight;
+    return {x0: 0, y0: top, x1: innerWidth - 50, y1: Math.max(top + 50, bot)};
+  }
+  return {x0: 0, y0: 0, x1: innerWidth, y1: innerHeight};
+}
+function viewCenter(){ const a = viewArea(); return {x: (a.x0+a.x1)/2, y: (a.y0+a.y1)/2}; }
+function startView(){
+  const a = viewArea(), c = viewCenter();
+  let s, px, py;
+  if(CONFIG.startBounds){
+    const [x1,y1,x2,y2] = CONFIG.startBounds;
+    s = Math.min((a.x1-a.x0)/(x2-x1), (a.y1-a.y0)/(y2-y1));
+    px = (x1+x2)/2; py = (y1+y2)/2;
+  } else { s = startScale(); [px, py] = CONFIG.startCenter; }
+  scale = s; tx = c.x - px*s; ty = c.y - py*s; render();
 }
 $("zin").onclick  = ()=>{const c=viewCenter(); zoomAt(c.x, c.y, scale*1.6, true);};
 $("zout").onclick = ()=>{const c=viewCenter(); zoomAt(c.x, c.y, scale/1.6, true);};
@@ -921,7 +952,7 @@ function placeholder(){
 }
 let firstLoad = true;
 function afterLoad(){
-  if(firstLoad){ firstLoad=false; centerOn(...CONFIG.startCenter, startScale()); } else render();
+  if(firstLoad){ firstLoad=false; startView(); } else render();
 }
 function setSize(w,h){ W=w; H=h; layer.style.width=W+"px"; layer.style.height=H+"px"; }
 let QUELLE = "";   // "ordner" | "geraet" | "fehlt"
@@ -1048,7 +1079,7 @@ function szeneOeffnen(name, merken){
   body.scrollTop = 0;
   if(name === "schritte") setTimeout(()=>{ body.scrollTop = $("stepsTitle").offsetTop - 10; }, 280);
   measureDir();
-  centerOn(...CONFIG.startCenter, startScale());   // Karte auf Startansicht
+  setTimeout(startView, 30);   // Karte auf Startansicht
 }
 function wahlZeigen(){ document.body.classList.add("waehlen"); }
 function schrittZurueck(){

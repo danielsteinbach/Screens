@@ -168,8 +168,12 @@ svg{ display:block; }
 #mail{ flex-direction:column; background:#fff; }
 .mail-kopf{
   flex:none; background:#f7f7f9; border-bottom:1px solid #d9d9de;
-  padding:calc(var(--sat) + 32px) 10px 9px; display:flex; align-items:center; gap:2px;
+  /* Etwas mehr Luft nach oben: am Handy sitzt dort die Kamera.
+     Reicht die Seite unter die Statusleiste (randlos), rechnet --sat das
+     ohnehin weg, dann genuegt der kleinere Wert. */
+  padding:calc(var(--sat) + 44px) 10px 9px; display:flex; align-items:center; gap:2px;
 }
+body.randlos .mail-kopf{ padding-top:calc(var(--sat) + 32px); }
 .mail-zurueck{ display:flex; align-items:center; gap:2px; color:#2f7fd6; font-size:16px; padding:4px 6px 4px 2px; }
 .mail-zurueck svg{ width:19px; height:19px; fill:none; stroke:#2f7fd6; stroke-width:2.4;
                    stroke-linecap:round; stroke-linejoin:round; }

@@ -17,7 +17,7 @@
   Daniel Steinbach - danielsteinbach@gmx.net
 
   ABLAUF IM BILD
-    Sperrbildschirm mit Benachrichtigung  ->  antippen  ->  biometrische
+    Startseite mit Vollbild-Knopf  ->  Sperrbildschirm mit Benachrichtigung  ->  antippen  ->  biometrische
     Freigabe (Erkennung laeuft, dann freigegeben)  ->  die Mail oeffnet sich.
     Der Absender ist erst in der Mail zu sehen, auf dem Sperrbildschirm
     steht nur "Absender geschuetzt".
@@ -25,10 +25,15 @@
   BEDIENUNG, im Bild nicht sichtbar
     Benachrichtigung antippen ... Freigabe und Mail
     im Mail links oben zurueck ... wieder Sperrbildschirm
-    dreimal kurz auf die Uhr .... Einstellungen (Uhrzeit, Tag, Akku, Bild)
+    dreimal kurz auf den Tag ... Einstellungen (Tag, Vollbild, Bild)
     Taste 1 Sperrbildschirm   Taste 2 Ablauf ab Freigabe   Taste 3 Mail
     Taste 0 Einstellungen  ·  Taste F Vollbild  ·  Taste B Bild sichern
     Rechte Maustaste / langes Druecken ist abgeschaltet.
+
+  KEINE EIGENE UHR
+    Die Seite zeigt bewusst weder Uhrzeit noch Statusleiste noch Home-Balken:
+    am iPhone blendet iOS seine eigene Leiste darueber, zwei Uhrzeiten waeren
+    im Bild. Uhrzeit, Datum und Akkustand also am Geraet selbst einstellen.
 
   Eine Datei, keine externen Ressourcen, laeuft vollstaendig offline.
   Texte: Block TEXTE im Skript unten.
@@ -54,41 +59,38 @@ svg{ display:block; }
 .szene{ position:fixed; inset:0; display:none; }
 .szene.aktiv{ display:flex; }
 
-/* ---------- Statusleiste ---------- */
-.statusleiste{
-  position:fixed; left:0; right:0; top:0; height:calc(var(--sat) + 30px);
-  padding:0 26px; display:flex; align-items:flex-end; z-index:30;
-  color:#fff; font-size:12.5px; font-weight:600; pointer-events:none;
+/* ============================================================
+   0. STARTSEITE mit Vollbild-Knopf
+   ============================================================ */
+#start{
+  flex-direction:column; align-items:center; justify-content:center; gap:16px;
+  padding:0 26px calc(var(--sab) + 24px); text-align:center; color:#fff;
+  background:linear-gradient(160deg, #1c2230 0%, #0d1016 60%, #07080b 100%);
 }
-.statusleiste .rechts{ margin-left:auto; display:flex; align-items:center; gap:6px; padding-bottom:5px; }
-.statusleiste .links{ padding-bottom:5px; letter-spacing:.2px; }
-body.dunkelleiste .statusleiste{ color:#1c1e22; }
-body.dunkelleiste .statusleiste .balken rect,
-body.dunkelleiste .statusleiste .akku rect{ fill:#1c1e22; }
-body.dunkelleiste .statusleiste .akku .rahmen{ stroke:#1c1e22; }
-
-/* ---------- Home-Balken ---------- */
-.homebalken{
-  position:fixed; left:50%; bottom:calc(var(--sab) + 8px); width:134px; height:5px;
-  margin-left:-67px; border-radius:3px; background:rgba(255,255,255,.85); z-index:30;
+#start .titel{ font-size:19px; font-weight:600; letter-spacing:.2px; }
+#start .unter{ font-size:14px; opacity:.6; line-height:1.5; max-width:300px; }
+#start .los{
+  margin-top:10px; background:#2f7fd6; color:#fff; border-radius:26px;
+  padding:15px 30px; font-size:17px; font-weight:600; display:flex; align-items:center; gap:10px;
 }
-body.dunkelleiste .homebalken{ background:rgba(0,0,0,.35); }
+#start .los svg{ width:19px; height:19px; fill:none; stroke:#fff; stroke-width:2.2;
+                 stroke-linecap:round; stroke-linejoin:round; }
+#start .heim{ font-size:13px; opacity:.55; line-height:1.55; max-width:320px; margin-top:8px; }
 
 /* ============================================================
    1. SPERRBILDSCHIRM
    ============================================================ */
 #sperr{
   flex-direction:column; align-items:center;
-  padding:calc(var(--sat) + 62px) 16px calc(var(--sab) + 24px);
+  padding:calc(var(--sat) + 104px) 16px calc(var(--sab) + 24px);
   background:
     radial-gradient(circle at 30% 18%, rgba(255,255,255,.07), transparent 46%),
     linear-gradient(160deg, #1c2230 0%, #0d1016 55%, #07080b 100%);
 }
-.uhr{ color:#fff; text-align:center; margin-bottom:30px; }
+.uhr{ color:#fff; text-align:center; margin-bottom:26px; }
 .uhr .schloss{ opacity:.85; margin:0 auto 10px; width:17px; height:22px; }
 .uhr .schloss svg{ width:100%; height:100%; fill:none; stroke:#fff; stroke-width:1.7; }
 .uhr .tag{ font-size:16px; font-weight:600; opacity:.95; }
-.uhr .zeit{ font-size:80px; font-weight:250; line-height:1.02; letter-spacing:-1.5px; margin-top:2px; }
 
 .meldung{
   width:100%; max-width:390px; border-radius:20px; color:#fff; cursor:pointer;
@@ -253,23 +255,22 @@ body.bildlaeuft .meldung{ pointer-events:none; }
 </head>
 <body>
 
-<!-- ============ Statusleiste / Home-Balken ============ -->
-<div class="statusleiste">
-  <div class="links" id="sbZeit">14:23</div>
-  <div class="rechts">
-    <svg class="balken" width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".8" fill="#fff"/><rect x="4.5" y="5.5" width="3" height="6.5" rx=".8" fill="#fff"/><rect x="9" y="3" width="3" height="9" rx=".8" fill="#fff"/><rect x="13.5" y="0" width="3" height="12" rx=".8" fill="#fff"/></svg>
-    <span id="sbProzent">72%</span>
-    <svg class="akku" width="28" height="12" viewBox="0 0 28 12"><rect class="rahmen" x=".5" y=".5" width="24" height="11" rx="3.2" fill="none" stroke="#fff" stroke-opacity=".45"/><rect id="sbFuell" x="2" y="2" width="15" height="8" rx="1.8" fill="#fff"/><rect x="25.7" y="4" width="1.5" height="4" rx=".7" fill="#fff" fill-opacity=".45"/></svg>
-  </div>
+<!-- ============ 0. STARTSEITE ============ -->
+<div class="szene aktiv" id="start">
+  <div class="titel">6514 · Handy Pichlwanger</div>
+  <div class="unter">Vertrauliches Mail. Zum Start in den Vollbildmodus, damit keine Adresszeile im Bild ist.</div>
+  <button class="los" id="startLos">
+    <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    Vollbild starten
+  </button>
+  <div class="heim" id="startHeim">Am iPhone gibt es keinen Vollbildmodus für Webseiten: in Safari auf „Teilen“, dann „Zum Home-Bildschirm“ – von dort startet die Seite ohne Adresszeile.</div>
 </div>
-<div class="homebalken"></div>
 
 <!-- ============ 1. SPERRBILDSCHIRM ============ -->
 <div class="szene aktiv" id="sperr">
   <div class="uhr" id="uhrBlock">
     <div class="schloss"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="11" rx="3"/><path d="M8.2 10.5V7.4a3.8 3.8 0 0 1 7.6 0v3.1"/></svg></div>
     <div class="tag" id="uhrTag">Mittwoch</div>
-    <div class="zeit" id="uhrZeit">14:23</div>
   </div>
 
   <div class="meldung" id="meldung">
@@ -370,16 +371,15 @@ body.bildlaeuft .meldung{ pointer-events:none; }
 
   <h2>Ansicht</h2>
   <div class="reihe">
+    <button class="karte" data-szene="start"><b>Startseite</b><small>Vollbild-Knopf vor dem Dreh (Taste 4)</small></button>
     <button class="karte" data-szene="sperr"><b>Sperrbildschirm</b><small>Startansicht mit der Benachrichtigung (Taste 1)</small></button>
     <button class="karte" data-szene="ablauf"><b>Ablauf ab Freigabe</b><small>Erkennung läuft, dann öffnet die Mail (Taste 2)</small></button>
     <button class="karte" data-szene="mail"><b>Mail</b><small>Direkt die geöffnete Mail (Taste 3)</small></button>
   </div>
 
-  <h2>Anzeige am Handy</h2>
+  <h2>Anzeige</h2>
   <div class="feldreihe">
-    <div class="feld"><label>Uhrzeit (leer = läuft mit)</label><input id="eZeit" type="text" inputmode="numeric" maxlength="5" placeholder="läuft mit"></div>
     <div class="feld"><label>Tag / Datumszeile</label><input id="eTag" type="text" placeholder="Mittwoch"></div>
-    <div class="feld"><label>Akku %</label><input id="eAkku" type="text" inputmode="numeric" maxlength="3" placeholder="72"></div>
   </div>
 
   <h2>Am Set</h2>
@@ -391,9 +391,10 @@ body.bildlaeuft .meldung{ pointer-events:none; }
   </div>
 
   <p class="fuss">
-    Zurück zu diesen Einstellungen: dreimal kurz auf die Uhr tippen
+    Zurück zu diesen Einstellungen: dreimal kurz auf den Tag tippen
     (in der Mail dreimal auf die Kopfleiste), am Rechner Taste <kbd>0</kbd>.<br>
-    Ohne Safari-Leisten am iPhone: Teilen › Zum Home-Bildschirm, dann von dort starten.
+    Die Seite zeigt keine eigene Uhrzeit und keine Statusleiste – die kommt vom
+    Gerät selbst. Uhrzeit, Datum und Akku daher am iPhone einstellen.
   </p>
 </div></div>
 
@@ -403,44 +404,30 @@ body.bildlaeuft .meldung{ pointer-events:none; }
 /* ===========================================================================
    Grundeinstellung
    ========================================================================= */
-var STAND = { zeit:"", tag:"Mittwoch", akku:72 };
+var STAND = { tag:"Mittwoch" };
 var E = {};
 try{ E = JSON.parse(localStorage.getItem("prop6514") || "{}") || {}; }catch(e){ E = {}; }
-["zeit","tag","akku"].forEach(function(k){ if(E[k] === undefined) E[k] = STAND[k]; });
+["tag"].forEach(function(k){ if(E[k] === undefined) E[k] = STAND[k]; });
 function merken(){ try{ localStorage.setItem("prop6514", JSON.stringify(E)); }catch(e){} }
 
 var $ = function(id){ return document.getElementById(id); };
 
-/* ---------- Uhr, Tag, Akku ---------- */
+/* ---------- Tag ----------
+   Bewusst ohne Uhrzeit: die Uhr kommt von der Statusleiste des Geraetes. */
 var TAGE = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
 function anzeigeSetzen(){
-  var z = E.zeit;
-  if(!/^\d{1,2}[:.]\d{2}$/.test(z || "")){
-    var j = new Date();
-    z = String(j.getHours()).padStart(2,"0") + ":" + String(j.getMinutes()).padStart(2,"0");
-  } else {
-    var t = z.split(/[:.]/);
-    z = String(Math.min(23, +t[0])).padStart(2,"0") + ":" + String(Math.min(59, +t[1])).padStart(2,"0");
-  }
-  $("uhrZeit").textContent = z;
-  $("sbZeit").textContent = z;
-  $("uhrTag").textContent = E.tag || TAGE[new Date().getDay()];
-  var a = Math.max(1, Math.min(100, parseInt(E.akku, 10) || 72));
-  $("sbProzent").textContent = a + "%";
-  $("sbFuell").setAttribute("width", (21 * a / 100).toFixed(1));
+  $("uhrTag").textContent = (E.tag === undefined ? TAGE[new Date().getDay()] : E.tag);
 }
 anzeigeSetzen();
-setInterval(function(){ if(!E.zeit) anzeigeSetzen(); }, 10000);
 
 /* ===========================================================================
    Szenen
    ========================================================================= */
-var SZENEN = ["sperr","freigabe","mail"];
+var SZENEN = ["start","sperr","freigabe","mail"];
 var laufend = null;
 function szene(name){
   clearTimeout(laufend);
   SZENEN.forEach(function(id){ $(id).classList.toggle("aktiv", id === name); });
-  document.body.classList.toggle("dunkelleiste", name === "mail");
   document.body.dataset.szene = name;
   if(name === "mail") $("mailInhalt").scrollTop = 0;
 }
@@ -455,6 +442,10 @@ function freigabeAblauf(){
     laufend = setTimeout(function(){ szene("mail"); }, 620);
   }, 1150);
 }
+$("startLos").addEventListener("click", function(){
+  vollbild();
+  szene("sperr");
+});
 $("meldung").addEventListener("click", freigabeAblauf);
 (function(){                       /* nach oben wischen oeffnet ebenfalls */
   var start = null;
@@ -482,18 +473,14 @@ dreifach($("uhrBlock"));
 dreifach(document.querySelector(".mail-kopf"));
 
 function einstellungenZeigen(){
-  $("eZeit").value = E.zeit || "";
   $("eTag").value  = E.tag || "";
-  $("eAkku").value = E.akku;
   document.body.classList.add("einstellungen");
 }
 function einstellungenZu(){ document.body.classList.remove("einstellungen"); }
 $("eZu").addEventListener("click", einstellungenZu);
-$("eZeit").addEventListener("input", function(e){ E.zeit = e.target.value.trim(); merken(); anzeigeSetzen(); });
 $("eTag").addEventListener("input",  function(e){ E.tag  = e.target.value; merken(); anzeigeSetzen(); });
-$("eAkku").addEventListener("input", function(e){ E.akku = e.target.value; merken(); anzeigeSetzen(); });
 $("eZurueck").addEventListener("click", function(){
-  E = { zeit:STAND.zeit, tag:STAND.tag, akku:STAND.akku };
+  E = { tag:STAND.tag };
   merken(); anzeigeSetzen(); einstellungenZeigen();
 });
 document.querySelectorAll(".karte[data-szene]").forEach(function(k){
@@ -529,7 +516,8 @@ $("eVollbild").addEventListener("click", vollbild);
 document.addEventListener("keydown", function(e){
   if(e.target.tagName === "INPUT") return;
   var k = e.key;
-  if(k === "1"){ einstellungenZu(); szene("sperr"); }
+  if(k === "4"){ einstellungenZu(); szene("start"); }
+  else if(k === "1"){ einstellungenZu(); szene("sperr"); }
   else if(k === "2"){ einstellungenZu(); freigabeAblauf(); }
   else if(k === "3"){ einstellungenZu(); szene("mail"); }
   else if(k === "0"){ einstellungenZeigen(); }
@@ -627,7 +615,7 @@ function zeigeWink(text, ms){
     "\n.szexp .szene{ position:relative !important; inset:auto !important; }" +
     "\n.szexp .mail-inhalt{ overflow:visible !important; height:auto !important;" +
     " max-height:none !important; flex:0 0 auto !important; }" +
-    "\n.szexp .einst, .szexp .wink{ display:none !important; }\n";
+    "\n.szexp .einst, .szexp .wink, .szexp #start{ display:none !important; }\n";
 
   function cssSammeln(B, H, quer){
     var roh = "", stile = document.querySelectorAll("style");
@@ -640,7 +628,8 @@ function zeigeWink(text, ms){
     var m = masse(), B = m.breite;
     var css = cssSammeln(B, m.hoehe, m.quer);
     var welche = document.body.dataset.szene || "sperr";
-    var quelle = document.getElementById(welche === "freigabe" ? "freigabe" : welche);
+    if(welche === "start") welche = "sperr";
+    var quelle = document.getElementById(welche);
 
     var hg = welche === "mail" ? "#ffffff" : "#07080b";
     var wrap = document.createElement("div");
@@ -654,15 +643,6 @@ function zeigeWink(text, ms){
     kopie.classList.add("aktiv");
     if(welche !== "mail") kopie.setAttribute("style", "min-height:" + m.hoehe + "px;");
     wrap.appendChild(kopie);
-    if(welche !== "mail"){
-      wrap.appendChild(document.querySelector(".statusleiste").cloneNode(true));
-      wrap.appendChild(document.querySelector(".homebalken").cloneNode(true));
-    } else {
-      /* im langen Mailbild die Statusleiste oben mitzeichnen, ohne Home-Balken */
-      var leiste = document.querySelector(".statusleiste").cloneNode(true);
-      leiste.setAttribute("style", "position:absolute; left:0; right:0; top:0;");
-      wrap.appendChild(leiste);
-    }
 
     var buehne = document.createElement("div");
     buehne.setAttribute("style", "position:fixed; left:-30000px; top:0; width:" + B + "px; z-index:-1; opacity:0; pointer-events:none;");
@@ -736,7 +716,7 @@ function zeigeWink(text, ms){
   document.getElementById("eBild").addEventListener("click", function(){ window.bildSichern(); });
 })();
 
-szene("sperr");
+szene("start");
 </script>
 </body>
 </html>

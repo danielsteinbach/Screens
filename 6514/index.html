@@ -428,10 +428,28 @@ function merken(){ try{ localStorage.setItem("prop6514", JSON.stringify(E)); }ca
 
 var $ = function(id){ return document.getElementById(id); };
 
-/* Sichtbare Hoehe messen und als --vh hinterlegen */
+/* Sichtbare Hoehe messen und als --vh hinterlegen.
+   Dazu die sicheren Raender pruefen: Reicht die Seite wirklich bis unter die
+   Statusleiste und bis zum Home-Balken, dann muessen wir dort Platz lassen.
+   Beginnt das Fenster aber ohnehin schon darunter - das ist am iPhone je nach
+   Startart der Fall -, meldet iOS die Raender trotzdem. Wer sie dann noch
+   einrechnet, schiebt die ganze Seite nach unten und laesst unten eine
+   leere Flaeche stehen. Genau das war hier zu sehen. */
 function hoeheMessen(){
   var h = window.innerHeight || document.documentElement.clientHeight;
+  var w = window.innerWidth || document.documentElement.clientWidth;
   document.documentElement.style.setProperty("--vh", h + "px");
+
+  var quer = w > h;
+  var schirmH = quer ? Math.min(screen.width, screen.height) : Math.max(screen.width, screen.height);
+  var randlos = !schirmH || h >= schirmH - 4;          /* Fenster = ganzer Bildschirm? */
+  /* Nur beim Start vom Home-Bildschirm abschalten. In Safari selbst braucht
+     die Seite die Raender weiterhin, dort liegen die Leisten darueber. */
+  var abziehen = !randlos && ohneLeisten();
+  var st = document.documentElement.style;
+  st.setProperty("--sat", abziehen ? "0px" : "env(safe-area-inset-top, 0px)");
+  st.setProperty("--sab", abziehen ? "0px" : "env(safe-area-inset-bottom, 0px)");
+  document.body.classList.toggle("randlos", !!randlos);
 }
 hoeheMessen();
 addEventListener("resize", hoeheMessen);
@@ -519,7 +537,10 @@ function messwerteZeigen(){
     "in Punkten:   " + Math.round(innerWidth * (devicePixelRatio||1)) + " x " + Math.round(innerHeight * (devicePixelRatio||1)),
     "Faktor:       " + (devicePixelRatio || 1),
     "ohne Leisten: " + (ohneLeisten() ? "ja" : "nein"),
-    "Rand unten:   " + (getComputedStyle(document.documentElement).getPropertyValue("--sab").trim() || "0px")
+    "Rand oben:    " + getComputedStyle($("uhrTag")).getPropertyValue("color").slice(0,0) +
+                     (getComputedStyle(document.documentElement).getPropertyValue("--sat").trim() || "0px"),
+    "Rand unten:   " + (getComputedStyle(document.documentElement).getPropertyValue("--sab").trim() || "0px"),
+    "Fenster = Bildschirm: " + (document.body.classList.contains("randlos") ? "ja" : "nein")
   ].join("\n");
 }
 function einstellungenZeigen(){

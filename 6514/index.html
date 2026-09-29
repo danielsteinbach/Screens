@@ -56,7 +56,11 @@ button{ font:inherit; color:inherit; border:0; background:none; padding:0; curso
 svg{ display:block; }
 
 /* ---------- Zustaende ---------- */
-.szene{ position:fixed; inset:0; display:none; }
+/* Einzelangaben statt der Kurzform "inset", die aeltere iOS-Fassungen nicht
+   kennen. --vh wird beim Start und bei jeder Groessenaenderung gemessen, damit
+   die Ansicht auch dann den ganzen Bildschirm fuellt, wenn dvh danebenliegt. */
+.szene{ position:fixed; left:0; right:0; top:0; bottom:0;
+        height:var(--vh, 100%); min-height:100%; display:none; }
 .szene.aktiv{ display:flex; }
 
 /* ============================================================
@@ -214,7 +218,7 @@ svg{ display:block; }
    Einstellungen (im Bild nicht sichtbar)
    ============================================================ */
 .einst{
-  display:none; position:fixed; inset:0; z-index:150; overflow:auto;
+  display:none; position:fixed; left:0; right:0; top:0; bottom:0; z-index:150; overflow:auto;
   background:#12141a; color:#e9ecf6; padding:26px 16px 40px;
   font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -240,6 +244,10 @@ body.einstellungen .einst{ display:block; }
 .knopf:hover{ background:#252934; }
 .knopf.haupt{ background:#2f6b8f; border-color:#2f6b8f; }
 .einst .fuss{ color:#6f749b; font-size:13px; line-height:1.7; margin-top:22px; }
+.einst .messwerte{ font-family:ui-monospace, Menlo, monospace; font-size:12.5px; color:#9aa0bd;
+                   background:#1a1d26; border:1px solid #2c303c; border-radius:9px;
+                   padding:10px 12px; line-height:1.7; margin:0; white-space:pre;
+                   -webkit-user-select:text; user-select:text; }
 .einst kbd{ background:#2b2d52; border-radius:4px; padding:1px 6px; }
 .wink{
   position:fixed; left:50%; bottom:34px; transform:translateX(-50%); z-index:200;
@@ -252,7 +260,8 @@ body.bildlaeuft .meldung{ pointer-events:none; }
 /* Fuer den Bildexport: Kopie aufklappen, Bedienspuren weg */
 .szexp{ box-sizing:border-box; margin:0; padding:0; }
 .szexp *{ animation:none !important; transition:none !important; }
-.szexp .szene{ position:relative !important; inset:auto !important; }
+.szexp .szene{ position:relative !important; left:auto !important; right:auto !important;
+                top:auto !important; bottom:auto !important; height:auto !important; min-height:0 !important; }
 .szexp .mail-inhalt{ overflow:visible !important; height:auto !important; flex:0 0 auto !important; }
 .szexp .einst, .szexp .wink{ display:none !important; }
 </style>
@@ -394,6 +403,9 @@ body.bildlaeuft .meldung{ pointer-events:none; }
     <button class="knopf" id="eZurueck">Auf Grundeinstellung</button>
   </div>
 
+  <h2>Bildschirm dieses Geräts</h2>
+  <p class="messwerte" id="messwerte">—</p>
+
   <p class="fuss">
     Zurück zu diesen Einstellungen: dreimal kurz auf den Tag tippen
     (in der Mail dreimal auf die Kopfleiste), am Rechner Taste <kbd>0</kbd>.<br>
@@ -415,6 +427,15 @@ try{ E = JSON.parse(localStorage.getItem("prop6514") || "{}") || {}; }catch(e){ 
 function merken(){ try{ localStorage.setItem("prop6514", JSON.stringify(E)); }catch(e){} }
 
 var $ = function(id){ return document.getElementById(id); };
+
+/* Sichtbare Hoehe messen und als --vh hinterlegen */
+function hoeheMessen(){
+  var h = window.innerHeight || document.documentElement.clientHeight;
+  document.documentElement.style.setProperty("--vh", h + "px");
+}
+hoeheMessen();
+addEventListener("resize", hoeheMessen);
+addEventListener("orientationchange", function(){ setTimeout(hoeheMessen, 250); });
 
 /* ---------- Tag ----------
    Bewusst ohne Uhrzeit: die Uhr kommt von der Statusleiste des Geraetes. */
@@ -489,7 +510,20 @@ function dreifach(el){
 dreifach($("uhrBlock"));
 dreifach(document.querySelector(".mail-kopf"));
 
+function messwerteZeigen(){
+  var v = window.visualViewport;
+  $("messwerte").textContent = [
+    "Fenster:      " + innerWidth + " x " + innerHeight,
+    "Sichtfeld:    " + (v ? Math.round(v.width) + " x " + Math.round(v.height) : "—"),
+    "Bildschirm:   " + screen.width + " x " + screen.height,
+    "in Punkten:   " + Math.round(innerWidth * (devicePixelRatio||1)) + " x " + Math.round(innerHeight * (devicePixelRatio||1)),
+    "Faktor:       " + (devicePixelRatio || 1),
+    "ohne Leisten: " + (ohneLeisten() ? "ja" : "nein"),
+    "Rand unten:   " + (getComputedStyle(document.documentElement).getPropertyValue("--sab").trim() || "0px")
+  ].join("\n");
+}
 function einstellungenZeigen(){
+  messwerteZeigen();
   $("eTag").value  = E.tag || "";
   document.body.classList.add("einstellungen");
 }
@@ -629,7 +663,8 @@ function zeigeWink(text, ms){
     "\n.szexp{ height:auto !important; min-height:0 !important; max-height:none !important;" +
     " overflow:visible !important; display:block !important; }" +
     "\n.szexp *{ animation:none !important; transition:none !important; }" +
-    "\n.szexp .szene{ position:relative !important; inset:auto !important; }" +
+    "\n.szexp .szene{ position:relative !important; left:auto !important; right:auto !important;" +
+    " top:auto !important; bottom:auto !important; height:auto !important; min-height:0 !important; }" +
     "\n.szexp .mail-inhalt{ overflow:visible !important; height:auto !important;" +
     " max-height:none !important; flex:0 0 auto !important; }" +
     "\n.szexp .einst, .szexp .wink, .szexp #start{ display:none !important; }\n";
@@ -658,7 +693,7 @@ function zeigeWink(text, ms){
        Mail: so lang, wie der Text ist.                                */
     var kopie = quelle.cloneNode(true);
     kopie.classList.add("aktiv");
-    if(welche !== "mail") kopie.setAttribute("style", "min-height:" + m.hoehe + "px;");
+    if(welche !== "mail") kopie.setAttribute("style", "min-height:" + m.hoehe + "px !important;");
     wrap.appendChild(kopie);
 
     var buehne = document.createElement("div");

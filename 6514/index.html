@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="6514">
+<meta name="theme-color" content="#07080b">
+<title>6514 Vertrauliches Mail</title>
+<!--
+================================================================================
+  PROP-BILDSCHIRM  6514  Handy Pichlwanger, vertrauliches Mail
+  SKL26 SOKO Linz - Szene 6514 - iPhone 12 hochkant
+  Daniel Steinbach - danielsteinbach@gmx.net
+
+  ABLAUF IM BILD
+    Sperrbildschirm mit Benachrichtigung  ->  antippen  ->  biometrische
+    Freigabe (Erkennung laeuft, dann freigegeben)  ->  die Mail oeffnet sich.
+    Der Absender ist erst in der Mail zu sehen, auf dem Sperrbildschirm
+    steht nur "Absender geschuetzt".
+
+  BEDIENUNG, im Bild nicht sichtbar
+    Benachrichtigung antippen ... Freigabe und Mail
+    im Mail links oben zurueck ... wieder Sperrbildschirm
+    dreimal kurz auf die Uhr .... Einstellungen (Uhrzeit, Tag, Akku, Bild)
+    Taste 1 Sperrbildschirm   Taste 2 Ablauf ab Freigabe   Taste 3 Mail
+    Taste 0 Einstellungen  ·  Taste F Vollbild  ·  Taste B Bild sichern
+    Rechte Maustaste / langes Druecken ist abgeschaltet.
+
+  Eine Datei, keine externen Ressourcen, laeuft vollstaendig offline.
+  Texte: Block TEXTE im Skript unten.
+================================================================================
+-->
+<style>
+:root{
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --rot: #c0392b;
+  --schrift: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{
+  height:100%; height:100dvh; margin:0; overflow:hidden; background:#07080b;
+  font-family:var(--schrift); -webkit-font-smoothing:antialiased;
+  -webkit-user-select:none; user-select:none; overscroll-behavior:none;
+}
+button{ font:inherit; color:inherit; border:0; background:none; padding:0; cursor:pointer; }
+svg{ display:block; }
+
+/* ---------- Zustaende ---------- */
+.szene{ position:fixed; inset:0; display:none; }
+.szene.aktiv{ display:flex; }
+
+/* ---------- Statusleiste ---------- */
+.statusleiste{
+  position:fixed; left:0; right:0; top:0; height:calc(var(--sat) + 30px);
+  padding:0 26px; display:flex; align-items:flex-end; z-index:30;
+  color:#fff; font-size:12.5px; font-weight:600; pointer-events:none;
+}
+.statusleiste .rechts{ margin-left:auto; display:flex; align-items:center; gap:6px; padding-bottom:5px; }
+.statusleiste .links{ padding-bottom:5px; letter-spacing:.2px; }
+body.dunkelleiste .statusleiste{ color:#1c1e22; }
+body.dunkelleiste .statusleiste .balken rect,
+body.dunkelleiste .statusleiste .akku rect{ fill:#1c1e22; }
+body.dunkelleiste .statusleiste .akku .rahmen{ stroke:#1c1e22; }
+
+/* ---------- Home-Balken ---------- */
+.homebalken{
+  position:fixed; left:50%; bottom:calc(var(--sab) + 8px); width:134px; height:5px;
+  margin-left:-67px; border-radius:3px; background:rgba(255,255,255,.85); z-index:30;
+}
+body.dunkelleiste .homebalken{ background:rgba(0,0,0,.35); }
+
+/* ============================================================
+   1. SPERRBILDSCHIRM
+   ============================================================ */
+#sperr{
+  flex-direction:column; align-items:center;
+  padding:calc(var(--sat) + 62px) 16px calc(var(--sab) + 24px);
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255,255,255,.07), transparent 46%),
+    linear-gradient(160deg, #1c2230 0%, #0d1016 55%, #07080b 100%);
+}
+.uhr{ color:#fff; text-align:center; margin-bottom:30px; }
+.uhr .schloss{ opacity:.85; margin:0 auto 10px; width:17px; height:22px; }
+.uhr .schloss svg{ width:100%; height:100%; fill:none; stroke:#fff; stroke-width:1.7; }
+.uhr .tag{ font-size:16px; font-weight:600; opacity:.95; }
+.uhr .zeit{ font-size:80px; font-weight:250; line-height:1.02; letter-spacing:-1.5px; margin-top:2px; }
+
+.meldung{
+  width:100%; max-width:390px; border-radius:20px; color:#fff; cursor:pointer;
+  background:rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(20px) saturate(140%); backdrop-filter:blur(20px) saturate(140%);
+  box-shadow:0 8px 30px rgba(0,0,0,.35);
+  padding:12px 14px 13px; transition:transform .12s ease, background .12s ease;
+}
+.meldung:active{ transform:scale(.975); background:rgba(255,255,255,.22); }
+.m-kopf{ display:flex; align-items:center; gap:7px; margin-bottom:9px; }
+.m-symbol{ width:21px; height:21px; border-radius:6px; background:#2f7fd6; flex:none;
+           display:flex; align-items:center; justify-content:center; }
+.m-symbol svg{ width:12px; height:12px; fill:none; stroke:#fff; stroke-width:2;
+               stroke-linecap:round; stroke-linejoin:round; }
+.m-app{ font-size:12px; font-weight:600; opacity:.85; text-transform:uppercase; letter-spacing:.4px; }
+.m-zeit{ margin-left:auto; font-size:12.5px; opacity:.72; }
+.m-band{
+  display:inline-flex; align-items:center; gap:5px; background:var(--rot); color:#fff;
+  font-size:10.5px; font-weight:700; letter-spacing:.3px; line-height:1.3;
+  padding:3px 8px; border-radius:5px; margin-bottom:8px;
+}
+.m-band svg{ width:10px; height:10px; fill:none; stroke:#fff; stroke-width:2.4;
+             stroke-linecap:round; stroke-linejoin:round; }
+.m-absender{ font-size:15.5px; font-weight:700; margin-bottom:2px; }
+.m-betreff{ font-size:14.5px; line-height:1.38; opacity:.95; }
+
+.wischen{
+  position:absolute; left:0; right:0; bottom:calc(var(--sab) + 26px);
+  text-align:center; color:rgba(255,255,255,.45); font-size:12.5px;
+}
+.schnell{
+  position:absolute; bottom:calc(var(--sab) + 58px); width:48px; height:48px; border-radius:50%;
+  background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center;
+}
+.schnell svg{ width:21px; height:21px; fill:#fff; }
+.schnell.links{ left:44px; } .schnell.rechts{ right:44px; }
+
+/* ============================================================
+   2. BIOMETRISCHE FREIGABE
+   ============================================================ */
+#freigabe{
+  flex-direction:column; align-items:center; justify-content:center; gap:20px;
+  background:rgba(7,8,11,.96);
+  -webkit-backdrop-filter:blur(30px); backdrop-filter:blur(30px);
+}
+.scan{ width:96px; height:96px; position:relative; }
+.scan svg{ width:100%; height:100%; fill:none; stroke:#fff; stroke-width:1.7;
+           stroke-linecap:round; stroke-linejoin:round; }
+.scan .zug{ stroke:#fff; opacity:.9; }
+.scan .strich{
+  position:absolute; left:8px; right:8px; height:2px; top:14px; border-radius:2px;
+  background:linear-gradient(90deg, transparent, rgba(120,200,255,.95), transparent);
+  box-shadow:0 0 12px rgba(120,200,255,.8);
+  animation:scanlauf 1.15s ease-in-out infinite;
+}
+@keyframes scanlauf{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(66px); } }
+.scan .haken{ stroke:#35c759; stroke-width:6; stroke-dasharray:60; stroke-dashoffset:60;
+              transition:stroke-dashoffset .35s ease; }
+.freigabe-text{ color:#fff; font-size:15px; opacity:.85; letter-spacing:.2px; }
+#freigabe.erkannt .strich{ display:none; }
+#freigabe.erkannt .scan .zug{ opacity:.35; }
+#freigabe.erkannt .scan .haken{ stroke-dashoffset:0; }
+#freigabe.erkannt .freigabe-text{ color:#35c759; opacity:1; }
+
+/* ============================================================
+   3. MAIL
+   ============================================================ */
+#mail{ flex-direction:column; background:#fff; }
+.mail-kopf{
+  flex:none; background:#f7f7f9; border-bottom:1px solid #d9d9de;
+  padding:calc(var(--sat) + 32px) 10px 9px; display:flex; align-items:center; gap:2px;
+}
+.mail-zurueck{ display:flex; align-items:center; gap:2px; color:#2f7fd6; font-size:16px; padding:4px 6px 4px 2px; }
+.mail-zurueck svg{ width:19px; height:19px; fill:none; stroke:#2f7fd6; stroke-width:2.4;
+                   stroke-linecap:round; stroke-linejoin:round; }
+.mail-werkzeuge{ margin-left:auto; display:flex; gap:20px; padding-right:8px; color:#2f7fd6; }
+.mail-werkzeuge svg{ width:19px; height:19px; fill:none; stroke:#2f7fd6; stroke-width:1.9;
+                     stroke-linecap:round; stroke-linejoin:round; }
+.mail-inhalt{
+  flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:16px 18px calc(var(--sab) + 26px); color:#1c1e22;
+}
+.mail-betreff{ font-size:21px; font-weight:700; line-height:1.25; margin:0 0 12px; letter-spacing:-.2px; }
+.mail-von{ display:flex; align-items:flex-start; gap:11px; padding-bottom:13px;
+           border-bottom:1px solid #e2e2e7; margin-bottom:14px; }
+.mail-bild{ width:38px; height:38px; border-radius:50%; background:#5a6472; flex:none;
+            display:flex; align-items:center; justify-content:center; color:#fff;
+            font-size:13px; font-weight:700; letter-spacing:.3px; }
+.mail-von .wer{ min-width:0; }
+.mail-von .name{ font-size:15px; font-weight:700; line-height:1.3; }
+.mail-von .an{ font-size:12.5px; color:#6b6f78; margin-top:2px; word-break:break-all; }
+.mail-von .zeit{ margin-left:auto; font-size:12.5px; color:#6b6f78; white-space:nowrap; padding-top:2px; }
+.mail-warnung{
+  display:flex; align-items:center; gap:8px; background:#fdecea; border:1px solid #f0b7b0;
+  border-left:4px solid var(--rot); color:#8e2119; border-radius:8px;
+  padding:9px 11px; font-size:12.5px; font-weight:700; line-height:1.35; margin-bottom:16px;
+}
+.mail-warnung svg{ width:15px; height:15px; flex:none; fill:none; stroke:#8e2119;
+                   stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.mail-text{ font-size:15.5px; line-height:1.62; }
+.mail-text p{ margin:0 0 13px; }
+.mail-text .daten{ margin:0 0 13px; }
+.mail-text .daten div{ display:flex; gap:8px; }
+.mail-text .daten b{ flex:none; min-width:92px; font-weight:600; }
+.mail-text .gruss{ margin-top:18px; }
+.mail-signatur{ margin-top:4px; font-size:14px; line-height:1.55; color:#3a3d44; }
+.mail-signatur .n{ font-weight:700; color:#1c1e22; }
+.mail-fuss{
+  flex:none; display:flex; justify-content:space-around; align-items:center;
+  border-top:1px solid #d9d9de; background:#f7f7f9;
+  padding:9px 18px calc(var(--sab) + 22px); color:#2f7fd6;
+}
+.mail-fuss svg{ width:20px; height:20px; fill:none; stroke:#2f7fd6; stroke-width:1.9;
+                stroke-linecap:round; stroke-linejoin:round; }
+
+/* ============================================================
+   Einstellungen (im Bild nicht sichtbar)
+   ============================================================ */
+.einst{
+  display:none; position:fixed; inset:0; z-index:150; overflow:auto;
+  background:#12141a; color:#e9ecf6; padding:26px 16px 40px;
+  font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+body.einstellungen .einst{ display:block; }
+.einst .innen{ max-width:520px; margin:0 auto; }
+.einst h1{ font-size:22px; margin:0 0 4px; }
+.einst .unter{ color:#9aa0bd; font-size:14.5px; margin:0 0 22px; }
+.einst h2{ font-size:12.5px; text-transform:uppercase; letter-spacing:.06em; color:#9aa0bd;
+           margin:22px 0 9px; font-weight:600; }
+.reihe{ display:flex; flex-wrap:wrap; gap:9px; }
+.karte{ flex:1 1 150px; text-align:left; background:#1d2029; border:1px solid #2c303c;
+        border-radius:12px; padding:13px 14px; color:#e9ecf6; }
+.karte:hover{ background:#252934; }
+.karte b{ display:block; font-size:15px; }
+.karte small{ display:block; color:#9aa0bd; font-size:12.5px; margin-top:3px; line-height:1.45; }
+.feldreihe{ display:flex; flex-wrap:wrap; gap:12px; }
+.feld{ flex:1 1 130px; }
+.feld label{ display:block; font-size:12.5px; color:#9aa0bd; margin-bottom:5px; }
+.feld input{ width:100%; font:inherit; font-size:15px; padding:9px 10px; border-radius:9px;
+             border:1px solid #3a4150; background:#1a1d26; color:#e9ecf6; }
+.knopf{ background:#1d2029; border:1px solid #2c303c; color:#e9ecf6; border-radius:18px;
+        padding:9px 16px; font-size:13.5px; font-weight:600; }
+.knopf:hover{ background:#252934; }
+.knopf.haupt{ background:#2f6b8f; border-color:#2f6b8f; }
+.einst .fuss{ color:#6f749b; font-size:13px; line-height:1.7; margin-top:22px; }
+.einst kbd{ background:#2b2d52; border-radius:4px; padding:1px 6px; }
+.wink{
+  position:fixed; left:50%; bottom:34px; transform:translateX(-50%); z-index:200;
+  background:rgba(18,20,26,.94); color:#fff; border-radius:10px; padding:11px 15px;
+  font-size:13.5px; line-height:1.45; max-width:86%; text-align:center; display:none;
+}
+.wink.an{ display:block; }
+body.bildlaeuft .meldung{ pointer-events:none; }
+
+/* Fuer den Bildexport: Kopie aufklappen, Bedienspuren weg */
+.szexp{ box-sizing:border-box; margin:0; padding:0; }
+.szexp *{ animation:none !important; transition:none !important; }
+.szexp .szene{ position:relative !important; inset:auto !important; }
+.szexp .mail-inhalt{ overflow:visible !important; height:auto !important; flex:0 0 auto !important; }
+.szexp .einst, .szexp .wink{ display:none !important; }
+</style>
+</head>
+<body>
+
+<!-- ============ Statusleiste / Home-Balken ============ -->
+<div class="statusleiste">
+  <div class="links" id="sbZeit">14:23</div>
+  <div class="rechts">
+    <svg class="balken" width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".8" fill="#fff"/><rect x="4.5" y="5.5" width="3" height="6.5" rx=".8" fill="#fff"/><rect x="9" y="3" width="3" height="9" rx=".8" fill="#fff"/><rect x="13.5" y="0" width="3" height="12" rx=".8" fill="#fff"/></svg>
+    <span id="sbProzent">72%</span>
+    <svg class="akku" width="28" height="12" viewBox="0 0 28 12"><rect class="rahmen" x=".5" y=".5" width="24" height="11" rx="3.2" fill="none" stroke="#fff" stroke-opacity=".45"/><rect id="sbFuell" x="2" y="2" width="15" height="8" rx="1.8" fill="#fff"/><rect x="25.7" y="4" width="1.5" height="4" rx=".7" fill="#fff" fill-opacity=".45"/></svg>
+  </div>
+</div>
+<div class="homebalken"></div>
+
+<!-- ============ 1. SPERRBILDSCHIRM ============ -->
+<div class="szene aktiv" id="sperr">
+  <div class="uhr" id="uhrBlock">
+    <div class="schloss"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="11" rx="3"/><path d="M8.2 10.5V7.4a3.8 3.8 0 0 1 7.6 0v3.1"/></svg></div>
+    <div class="tag" id="uhrTag">Mittwoch</div>
+    <div class="zeit" id="uhrZeit">14:23</div>
+  </div>
+
+  <div class="meldung" id="meldung">
+    <div class="m-kopf">
+      <div class="m-symbol"><svg viewBox="0 0 24 24"><path d="M3 6h18v12H3zM3 6l9 7 9-7"/></svg></div>
+      <div class="m-app">Mail</div>
+      <div class="m-zeit">jetzt</div>
+    </div>
+    <div class="m-band">
+      <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      VERTRAULICH – BIOMETRISCHE FREIGABE
+    </div>
+    <div class="m-absender">Absender geschützt</div>
+    <div class="m-betreff">Einsatzbesprechung Observation</div>
+  </div>
+
+  <div class="schnell links"><svg viewBox="0 0 24 24"><path d="M8 2h8v4.5l-1.3 1.8H9.3L8 6.5z"/><rect x="9.2" y="9.4" width="5.6" height="12" rx="2"/><rect x="11.1" y="12.4" width="1.8" height="2.8" rx=".9" fill="#000" fill-opacity=".5"/></svg></div>
+  <div class="schnell rechts"><svg viewBox="0 0 24 24"><path d="M8.2 6.5 9.4 4h5.2l1.2 2.5z"/><rect x="2" y="6.5" width="20" height="13.5" rx="3"/><circle cx="12" cy="13.2" r="3.9" fill="#000" fill-opacity=".5"/><circle cx="12" cy="13.2" r="2.3" fill="#fff" fill-opacity=".85"/></svg></div>
+  <div class="wischen">Zum Öffnen nach oben wischen</div>
+</div>
+
+<!-- ============ 2. BIOMETRISCHE FREIGABE ============ -->
+<div class="szene" id="freigabe">
+  <div class="scan">
+    <div class="strich" id="scanStrich"></div>
+    <svg viewBox="0 0 100 100">
+      <g class="zug">
+        <path d="M20 8H13a5 5 0 0 0-5 5v7M80 8h7a5 5 0 0 1 5 5v7M20 92H13a5 5 0 0 1-5-5v-7M80 92h7a5 5 0 0 0 5-5v-7"/>
+        <path d="M35 40v6M65 40v6"/>
+        <path d="M50 38v16h-6"/>
+        <path d="M35 64c8 7 22 7 30 0"/>
+      </g>
+      <path class="haken" d="M31 52l13 14 26-28"/>
+    </svg>
+  </div>
+  <div class="freigabe-text" id="freigabeText">Biometrische Erkennung …</div>
+</div>
+
+<!-- ============ 3. MAIL ============ -->
+<div class="szene" id="mail">
+  <div class="mail-kopf">
+    <button class="mail-zurueck" id="mailZurueck"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>Posteingang</button>
+    <div class="mail-werkzeuge">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18v12H3zM3 6l9 7 9-7"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+    </div>
+  </div>
+
+  <div class="mail-inhalt" id="mailInhalt">
+    <h1 class="mail-betreff">Einsatzbesprechung Observation – VERTRAULICH – nur Empfänger</h1>
+
+    <div class="mail-von">
+      <div class="mail-bild">LKA</div>
+      <div class="wer">
+        <div class="name">Sicherheitsbüro LKA OÖ – Ref. 4.2 Observation</div>
+        <div class="an">an Stefan.Pichlwanger@polizei.gv.at</div>
+      </div>
+      <div class="zeit">jetzt</div>
+    </div>
+
+    <div class="mail-warnung">
+      <svg viewBox="0 0 24 24"><path d="M12 3.5 1.8 20.5h20.4z"/><path d="M12 10v4.4M12 17.4v.1"/></svg>
+      VERTRAULICH – Weitergabe verboten (§ 12 SPG)
+    </div>
+
+    <div class="mail-text">
+      <p>Herr Chefinspektor,</p>
+      <p>im Zuge der laufenden Observation im Fall Az. 17-LKA-0094/26 (bekannte Person aus Ihrem Umfeld) ersuchen wir um Ihre Teilnahme an einer internen Lagebesprechung.</p>
+      <div class="daten">
+        <div><b>Termin:</b><span>Mittwoch, 14:00 Uhr</span></div>
+        <div><b>Ort:</b><span>LKA OÖ, Zimmer 204 (Zugang nur mit Ausweis, 2. OG)</span></div>
+        <div><b>Anwesenheit:</b><span>Ref. 4.2, Abt. Sonderdelikte, ggf. StA Linz</span></div>
+      </div>
+      <p><b>Hintergrund:</b> Im Zuge der Überwachungsmaßnahmen haben sich neue Erkenntnisse ergeben, die Ihre bisherigen Angaben im Verfahren berühren könnten. Wir bitten Sie, diese Einladung weder telefonisch noch schriftlich zu bestätigen – persönliche Vorsprache genügt.</p>
+      <p>Bitte nehmen Sie keine Kolleginnen und Kollegen Ihres Teams in Kenntnis.</p>
+      <p class="gruss">Mit kollegialen Grüßen</p>
+      <div class="mail-signatur">
+        <div class="n">Bezirksinspektor Mag. Thomas Ehrenfellner</div>
+        <div>LKA Oberösterreich – Referat 4.2 Observation &amp; Sondermaßnahmen</div>
+        <div>Telefon intern: 94-2281</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mail-fuss">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M3 5h18v14H3zM3 5l9 7 9-7"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h9a6 6 0 0 1 6 6v3"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5M20 9H11a6 6 0 0 0-6 6v3"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
+  </div>
+</div>
+
+<!-- ============ Einstellungen ============ -->
+<div class="einst" id="einst"><div class="innen">
+  <h1>6514 · Vertrauliches Mail</h1>
+  <p class="unter">SKL26 SOKO Linz · Handy Pichlwanger · iPhone 12 hochkant</p>
+
+  <h2>Ansicht</h2>
+  <div class="reihe">
+    <button class="karte" data-szene="sperr"><b>Sperrbildschirm</b><small>Startansicht mit der Benachrichtigung (Taste 1)</small></button>
+    <button class="karte" data-szene="ablauf"><b>Ablauf ab Freigabe</b><small>Erkennung läuft, dann öffnet die Mail (Taste 2)</small></button>
+    <button class="karte" data-szene="mail"><b>Mail</b><small>Direkt die geöffnete Mail (Taste 3)</small></button>
+  </div>
+
+  <h2>Anzeige am Handy</h2>
+  <div class="feldreihe">
+    <div class="feld"><label>Uhrzeit (leer = läuft mit)</label><input id="eZeit" type="text" inputmode="numeric" maxlength="5" placeholder="läuft mit"></div>
+    <div class="feld"><label>Tag / Datumszeile</label><input id="eTag" type="text" placeholder="Mittwoch"></div>
+    <div class="feld"><label>Akku %</label><input id="eAkku" type="text" inputmode="numeric" maxlength="3" placeholder="72"></div>
+  </div>
+
+  <h2>Am Set</h2>
+  <div class="reihe" style="margin-top:2px">
+    <button class="knopf haupt" id="eZu">Weiter zum Bildschirm</button>
+    <button class="knopf" id="eVollbild">Vollbild</button>
+    <button class="knopf" id="eBild">Als Bild sichern</button>
+    <button class="knopf" id="eZurueck">Auf Grundeinstellung</button>
+  </div>
+
+  <p class="fuss">
+    Zurück zu diesen Einstellungen: dreimal kurz auf die Uhr tippen
+    (in der Mail dreimal auf die Kopfleiste), am Rechner Taste <kbd>0</kbd>.<br>
+    Ohne Safari-Leisten am iPhone: Teilen › Zum Home-Bildschirm, dann von dort starten.
+  </p>
+</div></div>
+
+<div class="wink" id="wink"></div>
+
+<script>
+/* ===========================================================================
+   Grundeinstellung
+   ========================================================================= */
+var STAND = { zeit:"", tag:"Mittwoch", akku:72 };
+var E = {};
+try{ E = JSON.parse(localStorage.getItem("prop6514") || "{}") || {}; }catch(e){ E = {}; }
+["zeit","tag","akku"].forEach(function(k){ if(E[k] === undefined) E[k] = STAND[k]; });
+function merken(){ try{ localStorage.setItem("prop6514", JSON.stringify(E)); }catch(e){} }
+
+var $ = function(id){ return document.getElementById(id); };
+
+/* ---------- Uhr, Tag, Akku ---------- */
+var TAGE = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+function anzeigeSetzen(){
+  var z = E.zeit;
+  if(!/^\d{1,2}[:.]\d{2}$/.test(z || "")){
+    var j = new Date();
+    z = String(j.getHours()).padStart(2,"0") + ":" + String(j.getMinutes()).padStart(2,"0");
+  } else {
+    var t = z.split(/[:.]/);
+    z = String(Math.min(23, +t[0])).padStart(2,"0") + ":" + String(Math.min(59, +t[1])).padStart(2,"0");
+  }
+  $("uhrZeit").textContent = z;
+  $("sbZeit").textContent = z;
+  $("uhrTag").textContent = E.tag || TAGE[new Date().getDay()];
+  var a = Math.max(1, Math.min(100, parseInt(E.akku, 10) || 72));
+  $("sbProzent").textContent = a + "%";
+  $("sbFuell").setAttribute("width", (21 * a / 100).toFixed(1));
+}
+anzeigeSetzen();
+setInterval(function(){ if(!E.zeit) anzeigeSetzen(); }, 10000);
+
+/* ===========================================================================
+   Szenen
+   ========================================================================= */
+var SZENEN = ["sperr","freigabe","mail"];
+var laufend = null;
+function szene(name){
+  clearTimeout(laufend);
+  SZENEN.forEach(function(id){ $(id).classList.toggle("aktiv", id === name); });
+  document.body.classList.toggle("dunkelleiste", name === "mail");
+  document.body.dataset.szene = name;
+  if(name === "mail") $("mailInhalt").scrollTop = 0;
+}
+function freigabeAblauf(){
+  var f = $("freigabe");
+  f.classList.remove("erkannt");
+  $("freigabeText").textContent = "Biometrische Erkennung …";
+  szene("freigabe");
+  laufend = setTimeout(function(){
+    f.classList.add("erkannt");
+    $("freigabeText").textContent = "Freigegeben";
+    laufend = setTimeout(function(){ szene("mail"); }, 620);
+  }, 1150);
+}
+$("meldung").addEventListener("click", freigabeAblauf);
+(function(){                       /* nach oben wischen oeffnet ebenfalls */
+  var start = null;
+  var s = $("sperr");
+  s.addEventListener("pointerdown", function(e){ start = { y:e.clientY, t:Date.now() }; });
+  s.addEventListener("pointerup", function(e){
+    if(!start) return;
+    var dy = e.clientY - start.y, dt = Date.now() - start.t;
+    start = null;
+    if(dy < -55 && dt < 800 && document.body.dataset.szene === "sperr") freigabeAblauf();
+  });
+})();
+$("mailZurueck").addEventListener("click", function(){ szene("sperr"); });
+
+/* ---------- dreimal tippen: Einstellungen ---------- */
+function dreifach(el){
+  var n = 0, t = 0;
+  el.addEventListener("click", function(){
+    var jetzt = Date.now();
+    n = (jetzt - t < 800) ? n + 1 : 1; t = jetzt;
+    if(n >= 3){ n = 0; einstellungenZeigen(); }
+  });
+}
+dreifach($("uhrBlock"));
+dreifach(document.querySelector(".mail-kopf"));
+
+function einstellungenZeigen(){
+  $("eZeit").value = E.zeit || "";
+  $("eTag").value  = E.tag || "";
+  $("eAkku").value = E.akku;
+  document.body.classList.add("einstellungen");
+}
+function einstellungenZu(){ document.body.classList.remove("einstellungen"); }
+$("eZu").addEventListener("click", einstellungenZu);
+$("eZeit").addEventListener("input", function(e){ E.zeit = e.target.value.trim(); merken(); anzeigeSetzen(); });
+$("eTag").addEventListener("input",  function(e){ E.tag  = e.target.value; merken(); anzeigeSetzen(); });
+$("eAkku").addEventListener("input", function(e){ E.akku = e.target.value; merken(); anzeigeSetzen(); });
+$("eZurueck").addEventListener("click", function(){
+  E = { zeit:STAND.zeit, tag:STAND.tag, akku:STAND.akku };
+  merken(); anzeigeSetzen(); einstellungenZeigen();
+});
+document.querySelectorAll(".karte[data-szene]").forEach(function(k){
+  k.addEventListener("click", function(){
+    einstellungenZu();
+    var w = k.dataset.szene;
+    if(w === "ablauf") freigabeAblauf(); else szene(w);
+  });
+});
+
+/* ===========================================================================
+   Vollbild
+   ========================================================================= */
+var wurzel = document.documentElement;
+function imVollbild(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function ohneLeisten(){
+  return navigator.standalone === true ||
+         (window.matchMedia && window.matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches);
+}
+function vollbild(){
+  if(imVollbild()){ (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+  var f = wurzel.requestFullscreen || wurzel.webkitRequestFullscreen;
+  if(f){ try{ var r = f.call(wurzel); if(r && r.catch) r.catch(function(){}); }catch(e){} }
+  else if(!ohneLeisten()){
+    zeigeWink("Am iPhone ohne Leisten: in Safari auf Teilen, dann „Zum Home-Bildschirm“ und von dort starten.", 5000);
+  }
+}
+$("eVollbild").addEventListener("click", vollbild);
+
+/* ===========================================================================
+   Tastatur (am Rechner)
+   ========================================================================= */
+document.addEventListener("keydown", function(e){
+  if(e.target.tagName === "INPUT") return;
+  var k = e.key;
+  if(k === "1"){ einstellungenZu(); szene("sperr"); }
+  else if(k === "2"){ einstellungenZu(); freigabeAblauf(); }
+  else if(k === "3"){ einstellungenZu(); szene("mail"); }
+  else if(k === "0"){ einstellungenZeigen(); }
+  else if(k === "f" || k === "F"){ vollbild(); }
+  else if(k === "b" || k === "B"){ bildSichern(); }
+  else if(k === "Escape" || k === "Backspace"){
+    if(document.body.classList.contains("einstellungen")) einstellungenZu();
+    else szene("sperr");
+  }
+});
+document.addEventListener("contextmenu", function(e){
+  if(!document.body.classList.contains("einstellungen")) e.preventDefault();
+});
+
+function zeigeWink(text, ms){
+  var w = $("wink"); w.textContent = text; w.classList.add("an");
+  clearTimeout(zeigeWink.t); zeigeWink.t = setTimeout(function(){ w.classList.remove("an"); }, ms || 2200);
+}
+
+/* ===========================================================================
+   ALS BILD SICHERN
+   Zeichnet die Ansicht, die gerade zu sehen ist, in der Aufloesung des
+   Geraetes. Die Mail wird dabei in voller Laenge abgebildet.
+   ========================================================================= */
+(function(){
+  var MAXKANTE = 12000, MAXPIXEL = 16000000;
+
+  function masse(){
+    var dpr = window.devicePixelRatio || 1;
+    var kurz = Math.min(screen.width, screen.height), lang = Math.max(screen.width, screen.height);
+    var quer = window.innerWidth > window.innerHeight;
+    return { breite: quer ? lang : kurz, hoehe: quer ? kurz : lang, dpr: dpr, quer: quer };
+  }
+  function passend(t, start){
+    var tiefe = 0;
+    for(var j = start; j < t.length; j++){
+      var c = t.charAt(j);
+      if(c === "{") tiefe++;
+      else if(c === "}"){ tiefe--; if(tiefe === 0) return j; }
+    }
+    return t.length - 1;
+  }
+  function medienTest(frage, B, H, quer){
+    var oder = frage.split(",");
+    for(var i = 0; i < oder.length; i++){
+      var teile = oder[i].split(/\band\b/), alle = true;
+      for(var j = 0; j < teile.length; j++){
+        var t = teile[j].trim().replace(/^\(/, "").replace(/\)$/, "").trim();
+        if(!t) continue;
+        var p = t.split(":"), k = p[0].trim().toLowerCase(), v = (p[1] || "").trim().toLowerCase();
+        if(k === "max-width") alle = alle && (B <= parseFloat(v));
+        else if(k === "min-width") alle = alle && (B >= parseFloat(v));
+        else if(k === "max-height") alle = alle && (H <= parseFloat(v));
+        else if(k === "min-height") alle = alle && (H >= parseFloat(v));
+        else if(k === "orientation") alle = alle && (v === (quer ? "landscape" : "portrait"));
+        else if(k === "print") alle = false;
+      }
+      if(alle) return true;
+    }
+    return false;
+  }
+  function waehlerUmbauen(kopf){
+    return kopf.split(",").map(function(s){
+      s = s.trim(); if(!s) return "";
+      if(s === "html" || s === "body" || s === ":root") return ".szexp";
+      s = (" " + s).replace(/([^-\w.#\[]):root(?![-\w])/g, "$1\u0001")
+                   .replace(/([^-\w.#\[])body(?![-\w])/g, "$1\u0001")
+                   .replace(/([^-\w.#\[])html(?![-\w])/g, "$1\u0001")
+                   .replace(/\u0001/g, ".szexp").trim();
+      return s.indexOf(".szexp") === 0 ? s : ".szexp " + s;
+    }).filter(Boolean).join(",");
+  }
+  function bearbeiten(css, B, H, quer){
+    var aus = "", i = 0;
+    while(i < css.length){
+      var auf = css.indexOf("{", i); if(auf < 0) break;
+      var kopf = css.slice(i, auf).trim(), zu = passend(css, auf), rumpf = css.slice(auf + 1, zu);
+      if(kopf.charAt(0) === "@"){
+        var art = kopf.slice(1).split(/[\s({]/)[0].toLowerCase();
+        if(art === "media"){ if(medienTest(kopf.slice(kopf.indexOf("media") + 5), B, H, quer)) aus += bearbeiten(rumpf, B, H, quer); }
+        else if(art === "supports"){ aus += bearbeiten(rumpf, B, H, quer); }
+        else aus += kopf + "{" + rumpf + "}";
+      } else aus += waehlerUmbauen(kopf) + "{" + rumpf + "}";
+      i = zu + 1;
+    }
+    return aus;
+  }
+  /* Zusatzregeln nur fuer die Kopie: aufklappen statt abschneiden.
+     Ohne sie erbt die Kopie die Bildschirmhoehe der Seite (100dvh) und
+     die Mail waere unten abgeschnitten. */
+  var EXTRA =
+    "\n.szexp{ height:auto !important; min-height:0 !important; max-height:none !important;" +
+    " overflow:visible !important; display:block !important; }" +
+    "\n.szexp *{ animation:none !important; transition:none !important; }" +
+    "\n.szexp .szene{ position:relative !important; inset:auto !important; }" +
+    "\n.szexp .mail-inhalt{ overflow:visible !important; height:auto !important;" +
+    " max-height:none !important; flex:0 0 auto !important; }" +
+    "\n.szexp .einst, .szexp .wink{ display:none !important; }\n";
+
+  function cssSammeln(B, H, quer){
+    var roh = "", stile = document.querySelectorAll("style");
+    for(var i = 0; i < stile.length; i++) roh += stile[i].textContent + "\n";
+    roh = roh.replace(/\/\*[\s\S]*?\*\//g, "");
+    return bearbeiten(roh, B, H, quer) + EXTRA;
+  }
+
+  function erzeugen(nachher){
+    var m = masse(), B = m.breite;
+    var css = cssSammeln(B, m.hoehe, m.quer);
+    var welche = document.body.dataset.szene || "sperr";
+    var quelle = document.getElementById(welche === "freigabe" ? "freigabe" : welche);
+
+    var hg = welche === "mail" ? "#ffffff" : "#07080b";
+    var wrap = document.createElement("div");
+    wrap.className = "szexp " + document.body.className.replace(/einstellungen|bildlaeuft/g, "");
+    wrap.setAttribute("style", "width:" + B + "px; background:" + hg + "; color:#fff;" +
+      "position:relative; overflow:visible; font-family:" + getComputedStyle(document.body).fontFamily + ";");
+
+    /* Sperrbildschirm und Freigabe: genau ein Bildschirm hoch.
+       Mail: so lang, wie der Text ist.                                */
+    var kopie = quelle.cloneNode(true);
+    kopie.classList.add("aktiv");
+    if(welche !== "mail") kopie.setAttribute("style", "min-height:" + m.hoehe + "px;");
+    wrap.appendChild(kopie);
+    if(welche !== "mail"){
+      wrap.appendChild(document.querySelector(".statusleiste").cloneNode(true));
+      wrap.appendChild(document.querySelector(".homebalken").cloneNode(true));
+    } else {
+      /* im langen Mailbild die Statusleiste oben mitzeichnen, ohne Home-Balken */
+      var leiste = document.querySelector(".statusleiste").cloneNode(true);
+      leiste.setAttribute("style", "position:absolute; left:0; right:0; top:0;");
+      wrap.appendChild(leiste);
+    }
+
+    var buehne = document.createElement("div");
+    buehne.setAttribute("style", "position:fixed; left:-30000px; top:0; width:" + B + "px; z-index:-1; opacity:0; pointer-events:none;");
+    var stil = document.createElement("style"); stil.textContent = css;
+    buehne.appendChild(stil); buehne.appendChild(wrap);
+    document.body.appendChild(buehne);
+
+    var aufraeumen = function(){ if(buehne.parentNode) buehne.parentNode.removeChild(buehne); };
+    var hoeheCss = Math.max(m.hoehe, Math.ceil(wrap.getBoundingClientRect().height));
+    if(!hoeheCss){ aufraeumen(); nachher(null); return; }
+
+    var k = m.dpr;
+    var W = Math.round(B * k), H = Math.round(hoeheCss * k);
+    var f = Math.min(1, MAXKANTE / W, MAXKANTE / H, Math.sqrt(MAXPIXEL / (W * H)));
+    if(f < 1){ k = k * f; W = Math.round(B * k); H = Math.round(hoeheCss * k); }
+
+    var inhalt;
+    try{
+      wrap.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+      inhalt = new XMLSerializer().serializeToString(wrap);
+    }catch(e){ aufraeumen(); nachher(null); return; }
+
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H +
+      '" viewBox="0 0 ' + W + ' ' + H + '">' +
+      '<rect width="100%" height="100%" fill="' + hg + '"/>' +
+      '<foreignObject x="0" y="0" width="' + W + '" height="' + H + '">' +
+      '<div xmlns="http://www.w3.org/1999/xhtml" style="transform:scale(' + k + ');transform-origin:0 0;' +
+      'width:' + B + 'px;height:' + hoeheCss + 'px;">' +
+      '<style><![CDATA[' + css + ']]></style>' + inhalt + '</div></foreignObject></svg>';
+
+    var img = new Image();
+    img.onload = function(){
+      var c = document.createElement("canvas");
+      c.width = W; c.height = H;
+      var ctx = c.getContext("2d");
+      ctx.fillStyle = hg; ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(img, 0, 0, W, H);
+      aufraeumen();
+      var name = ("6514_" + (welche === "mail" ? "Mail" : welche === "freigabe" ? "Freigabe" : "Sperrbildschirm") +
+                  "_" + W + "x" + H + ".png").replace(/[^A-Za-z0-9_.-]/g, "");
+      if(c.toBlob) c.toBlob(function(b){ nachher({ blob:b, name:name, W:W, H:H }); }, "image/png");
+      else {
+        var d = c.toDataURL("image/png"), bin = atob(d.split(",")[1]), arr = new Uint8Array(bin.length);
+        for(var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        nachher({ blob:new Blob([arr], {type:"image/png"}), name:name, W:W, H:H });
+      }
+    };
+    img.onerror = function(){ aufraeumen(); nachher(null); };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+  window.bildErzeugen = erzeugen;
+
+  window.bildSichern = function(){
+    document.body.classList.remove("einstellungen");
+    document.body.classList.add("bildlaeuft");
+    zeigeWink("Das Bild wird erzeugt …", 8000);
+    setTimeout(function(){
+      erzeugen(function(e){
+        document.body.classList.remove("bildlaeuft");
+        if(!e){ zeigeWink("Das Bild konnte nicht erzeugt werden.", 3000); return; }
+        var url = URL.createObjectURL(e.blob);
+        var a = document.createElement("a");
+        a.href = url; a.download = e.name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+        zeigeWink("Bild gesichert · " + e.W + " × " + e.H + " Punkte · " +
+                  Math.round(e.blob.size / 1024) + " KB", 3200);
+      });
+    }, 80);
+  };
+  document.getElementById("eBild").addEventListener("click", function(){ window.bildSichern(); });
+})();
+
+szene("sperr");
+</script>
+</body>
+</html>

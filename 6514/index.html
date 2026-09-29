@@ -205,6 +205,7 @@ svg{ display:block; }
   flex:none; display:flex; justify-content:space-around; align-items:center;
   border-top:1px solid #d9d9de; background:#f7f7f9;
   padding:9px 18px calc(var(--sab) + 22px); color:#2f7fd6;
+  margin-bottom:-2px;            /* kein Haarspalt zum Bildschirmrand */
 }
 .mail-fuss svg{ width:20px; height:20px; fill:none; stroke:#2f7fd6; stroke-width:1.9;
                 stroke-linecap:round; stroke-linejoin:round; }
@@ -428,10 +429,23 @@ anzeigeSetzen();
    ========================================================================= */
 var SZENEN = ["start","sperr","freigabe","mail"];
 var laufend = null;
+/* Am iPhone fuellt iOS die Flaeche ausserhalb der Seite - unten beim
+   Home-Balken, oben hinter der Statusleiste - mit der Hintergrundfarbe des
+   Dokuments. Die muss darum zur jeweiligen Ansicht passen, sonst steht dort
+   ein schwarzer Streifen unter der hellen Mail. */
+var HINTERGRUND = { start:"#0d1016", sperr:"#07080b", freigabe:"#07080b", mail:"#f7f7f9" };
+function hintergrundSetzen(name){
+  var f = HINTERGRUND[name] || "#07080b";
+  document.documentElement.style.backgroundColor = f;
+  document.body.style.backgroundColor = f;
+  var m = document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute("content", f);
+}
 function szene(name){
   clearTimeout(laufend);
   SZENEN.forEach(function(id){ $(id).classList.toggle("aktiv", id === name); });
   document.body.dataset.szene = name;
+  hintergrundSetzen(name);
   if(name === "mail") $("mailInhalt").scrollTop = 0;
 }
 function freigabeAblauf(){
@@ -634,7 +648,7 @@ function zeigeWink(text, ms){
     if(welche === "start") welche = "sperr";
     var quelle = document.getElementById(welche);
 
-    var hg = welche === "mail" ? "#ffffff" : "#07080b";
+    var hg = welche === "mail" ? "#ffffff" : (HINTERGRUND[welche] || "#07080b");
     var wrap = document.createElement("div");
     wrap.className = "szexp " + document.body.className.replace(/einstellungen|bildlaeuft/g, "");
     wrap.setAttribute("style", "width:" + B + "px; background:" + hg + "; color:#fff;" +

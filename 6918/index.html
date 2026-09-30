@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#20232b">
+<title>Social-Media-Profil – Clara Roithamer</title>
+<!--
+================================================================================
+  AUSDRUCK  Social-Media-Profil Clara Roithamer          SKL 65-69, Szene 6936
+  PK Hauptbüro, Fallwand. Vergrößerter Screenshot, ausgedruckt und an die
+  Fallwand gehängt (kein Bildschirm-Prop, kein Scene-Umschalt-System noetig -
+  eine einzelne Seite).
+
+  WICHTIG (Drehbuch 6936 + Querverweis 6918):
+    - Profilbild oben: Clara lehnt am markanten Baum, See im Hintergrund -
+      selber Baum wie auf der Ansichtskarte von Krachers Unterkunft. Das ist
+      der Hinweis, den Joe auf der Fallwand findet.
+    - Im Raster MUSS ein Foto der zwei Lounge-Sessel auf dem Podium vorkommen
+      (Beweisstück, vgl. Bild 6918 - Clara zeigt Joe genau dieses Foto auf
+      ihrem Handy). Hier als erstes/oben-links platziertes Rasterbild, klar
+      als Foto_Sessel_Podium.jpg gekennzeichnet, damit es beim Dreh leicht
+      wiederzufinden ist.
+    - Bewusst KEIN App-Logo, keine Markenfarben, kein "Verifiziert"-Haken,
+      kein Firmen-Wortmarke - nur allgemeine Profil-Kopf + Raster-Optik,
+      an mehrere Plattformen gleichzeitig angelehnt statt an eine bestimmte.
+
+  MEDIEN – Dateien im selben Ordner wie diese HTML-Datei:
+    Profilbild_Clara_Baum.jpg   rund, Profilbild oben
+    Foto_Sessel_Podium.jpg      Rasterbild oben links (siehe oben - wichtig!)
+    Post_2.jpg … Post_20.jpg    restliche Rasterbilder (19 Stueck)
+  Fehlt eine Datei, erscheint eine Greenscreen-Flaeche mit erwartetem Namen.
+  Per Klick auf ein Bild laesst sich ersatzweise eine Datei vom Geraet waehlen;
+  die Wahl wird gemerkt (localStorage). "Als Bild speichern" unten exportiert
+  die ganze Seite als PNG.
+
+  Eine Datei, keine externen Ressourcen.
+================================================================================
+-->
+<style>
+  :root{
+    --txt:   #1c1c1e;
+    --grau:  #737373;
+    --linie: #dcdcdc;
+    --seite: #f4f4f6;
+    --band:  #e3e3e7;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; background:var(--seite); color:var(--txt);
+    font-family:"Helvetica Neue", Helvetica, Arial, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  body{ margin:0; padding:0; }
+  .seite-aussen{ padding:32px 24px 100px; }
+
+  /* ---------------- Simulierte Plattform-Navigation ----------------
+     Rein dekorativ, Teil der simulierten Screenshot-Oberflaeche (wird mit
+     exportiert) - bewusst ANDERS als Instagrams Symbole/Anordnung: eigene
+     Icon-Auswahl, eigene Reihenfolge, farbiger Hintergrund statt Weiss. */
+  .plattform-rahmen{ display:flex; width:fit-content; margin:0 auto; }
+  .plattform-nav{
+    flex:none; width:64px; background:#eef1f4; border-radius:10px 0 0 10px;
+    display:flex; flex-direction:column; align-items:center; padding:22px 0;
+    gap:26px;
+  }
+  .plattform-nav .nav-icon{ width:30px; height:30px; display:flex; align-items:center;
+                             justify-content:center; border-radius:9px; color:#3a3d42; }
+  .plattform-nav .nav-icon svg{ width:20px; height:20px; fill:none; stroke:currentColor;
+                                 stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .plattform-nav .nav-icon.aktiv{ background:#3a3d42; color:#fff; }
+  .plattform-nav .nav-trenner{ flex:1; }
+  .plattform-nav .nav-avatar{ width:30px; height:30px; border-radius:50%; background:#c7cbd1; }
+  .plattform-inhalt{ width:563px; }
+
+  /* ---------------- Werkzeuge (fuer Rhea, NICHT Teil der Simulation,
+     wird beim Export nicht mit erfasst - liegt ausserhalb von #seite) ---- */
+  .werkzeuge{
+    position:fixed; right:20px; bottom:16px; z-index:20;
+    display:flex; gap:10px; align-items:center;
+    background:rgba(20,20,20,.75); border-radius:10px; padding:10px 12px;
+  }
+  .werkzeuge.versteckt{ display:none; }
+  .werkzeuge-toggle{
+    position:fixed; left:16px; bottom:16px; z-index:19;
+    width:30px; height:30px; border-radius:50%; border:0; cursor:pointer;
+    background:rgba(20,20,20,.35); color:#fff; opacity:.3;
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .15s, background .15s;
+  }
+  .werkzeuge-toggle:hover{ opacity:1; background:rgba(20,20,20,.75); }
+  .werkzeuge-toggle svg{ width:15px; height:15px; fill:none; stroke:#fff; stroke-width:1.8;
+                          stroke-linecap:round; stroke-linejoin:round; }
+  .werkzeuge .gruppe{ display:flex; align-items:center; gap:8px; color:#fff; font-size:12.5px;
+                       font-weight:600; }
+  .werkzeuge input[type=range]{ width:90px; }
+  .werkzeuge-trenner{ width:1px; align-self:stretch; background:rgba(255,255,255,.25); }
+  .werkzeugbtn{ font:inherit; font-size:12.5px; font-weight:600; color:#fff;
+                background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.3);
+                border-radius:7px; padding:7px 11px; cursor:pointer; }
+  .werkzeugbtn:hover{ background:rgba(255,255,255,.24); }
+
+  /* ---------------- Profilkarte ---------------- */
+  .seite{ width:100%; }
+  .karte{ width:100%; background:#fff; border-radius:0 10px 10px 0;
+          box-shadow:0 1px 4px rgba(0,0,0,.08); overflow:visible; }
+
+  .titelbild-wrap{ position:relative; }
+  .titelbild{ width:100%; aspect-ratio:2.4/1; background:#000; overflow:hidden;
+              border-radius:0 10px 0 0; cursor:pointer; }
+  .titelbild img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  .kopfzeile{ padding:0 24px 2px; }
+  .avatar-rahmen{
+    position:absolute; left:24px; width:132px; height:132px; border-radius:50%;
+    border:4px solid #fff; background:#fff; box-shadow:0 1px 5px rgba(0,0,0,.18);
+    cursor:pointer; z-index:2; top:100%; transform:translateY(-52px);
+  }
+  .avatar-rahmen img{ width:100%; height:100%; border-radius:50%; object-fit:cover; display:block; }
+
+  .kopf-info{ padding-top:10px; min-width:0; margin-left:150px; }
+  .name{ font-size:20px; font-weight:700; margin:0 0 2px; }
+  .handle{ font-size:14px; color:var(--grau); margin:0 0 10px; }
+  .stats{ display:flex; gap:26px; }
+  .stats .stat{ text-align:left; }
+  .stats .zahl{ font-size:16px; font-weight:700; display:block; }
+  .stats .label{ font-size:12.5px; color:var(--grau); }
+
+  .bio-zeile{ padding:2px 24px 20px 24px; margin-left:0; font-size:14px; line-height:1.5; color:var(--txt); }
+  .bio-zeile .beruf{ font-weight:600; }
+  .trenner{ border:0; border-top:1px solid var(--linie); margin:0; }
+
+  /* ---------------- Fotobereich mit Farbkontrast ---------------- */
+  .fotos-bereich{
+    background:var(--band); margin-top:22px; padding:26px 20px;
+    display:flex; justify-content:center; border-radius:0 10px 10px 0;
+  }
+  .raster-panel{ background:#fff; padding:12px; border-radius:8px;
+                 box-shadow:0 1px 4px rgba(0,0,0,.08); width:fit-content; }
+  .raster{
+    display:grid; grid-template-columns:repeat(2, 280px); gap:3px;
+  }
+  .zelle{ position:relative; aspect-ratio:1; overflow:hidden; background:#000; cursor:pointer; }
+  [data-medium]{ -webkit-user-drag:none; user-select:none; -webkit-user-select:none; }
+  .zelle img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .zelle-bearbeiten{
+    position:absolute; top:4px; right:4px; width:24px; height:24px; border-radius:6px;
+    background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:2; opacity:0; transition:opacity .15s;
+  }
+  .zelle:hover .zelle-bearbeiten{ opacity:1; }
+  .zelle-bearbeiten svg{ width:13px; height:13px; fill:none; stroke:#fff; stroke-width:2;
+                          stroke-linecap:round; stroke-linejoin:round; }
+
+  #dateiEingaben{ position:fixed; width:0; height:0; overflow:hidden; }
+
+  /* ---------------- Falsche Browserleiste (wie in den anderen Prop-Dateien) ----------------
+     OS-/Browser-Chrome, nicht Teil der simulierten Plattform - wird bei
+     Vollbild automatisch ausgeblendet. */
+  .browserbar{
+    position:sticky; top:0; z-index:50;
+    height:44px; flex:none; background:#d8d8d8; border-bottom:1px solid #bfbfbf;
+    display:flex; align-items:center; gap:16px; padding:0 16px; user-select:none;
+  }
+  body.imvollbild .browserbar{ display:none; }
+  .menue{ flex:none; cursor:pointer; display:flex; align-items:center; }
+  .menue svg{ width:26px; height:26px; display:block; }
+  .menue:hover{ opacity:.8; }
+  .urlbar{ flex:1; max-width:620px; margin:0 auto; background:#fff; border-radius:6px;
+           height:26px; line-height:26px; text-align:center; font-size:13px; color:#444; }
+  .navicons{ display:flex; align-items:center; gap:18px; color:#5a5a5a; font-size:16px; }
+  .navicons span{ cursor:pointer; display:inline-flex; align-items:center; }
+  .navicons span:hover{ color:#111; }
+  .navicons span.aus{ opacity:.35; cursor:default; }
+  .navicons svg{ width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2;
+                 stroke-linecap:round; stroke-linejoin:round; }
+
+  /* ---------------- Post-Detailansicht (beim Antippen eines Rasterbilds) ----------------
+     Bewusst generisch gehalten (Icon-Auswahl, keine Markenfarben) - an Instagram/
+     Facebook angelehnt, aber nicht kopiert. */
+  .post-overlay{
+    position:fixed; inset:0; z-index:80; background:#fff; display:none; flex-direction:column;
+  }
+  .post-overlay.offen{ display:flex; }
+  .post-leiste{ flex:none; height:50px; display:flex; align-items:center; padding:0 8px;
+                border-bottom:1px solid var(--linie); }
+  .post-schliessen{ width:34px; height:34px; border-radius:50%; border:0; background:transparent;
+                     display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .post-schliessen svg{ width:20px; height:20px; stroke:#1c1c1e; fill:none; stroke-width:2;
+                         stroke-linecap:round; stroke-linejoin:round; }
+  .post-inhalt{ flex:1; min-height:0; overflow-y:auto; }
+  .post-bild{ width:100%; background:#000; }
+  .post-bild img{ width:100%; display:block; }
+  .post-details{ padding:14px 16px 30px; max-width:620px; margin:0 auto; }
+  .post-kopf{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .post-avatar{ width:34px; height:34px; border-radius:50%; background:#c7cbd1; flex:none;
+                overflow:hidden; }
+  .post-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .post-name{ font-weight:700; font-size:14px; }
+  .post-zeit{ font-size:12px; color:var(--grau); }
+  .post-aktionen{ display:flex; align-items:center; gap:18px; margin-bottom:10px; }
+  .post-icon{ width:23px; height:23px; display:flex; cursor:pointer; }
+  .post-icon svg{ width:100%; height:100%; fill:none; stroke:#1c1c1e; stroke-width:1.7;
+                   stroke-linecap:round; stroke-linejoin:round; }
+  .post-icon.rechts{ margin-left:auto; }
+  .post-likes{ font-weight:700; font-size:13.5px; margin-bottom:8px; }
+  .post-caption{ font-size:13.5px; line-height:1.55; margin-bottom:16px; }
+  .post-kommentare{ display:flex; flex-direction:column; gap:11px; margin-bottom:18px; }
+  .kommentar{ font-size:13.5px; line-height:1.45; }
+  .post-kommentar-eingabe{ display:flex; align-items:center; gap:10px; border-top:1px solid var(--linie);
+                            padding-top:12px; }
+  .mini-avatar{ width:26px; height:26px; border-radius:50%; background:#c7cbd1; flex:none; }
+  .post-kommentar-eingabe input{ flex:1; min-width:0; border:0; font:inherit; font-size:13.5px;
+                                  color:var(--grau); background:transparent; }
+
+  /* ---------------- Handy-taugliches Layout (z.B. Google Pixel 6a, ~412px breit) ---------------- */
+  @media (max-width:480px){
+    html,body{ height:100%; overflow:hidden; }
+    body{ display:flex; flex-direction:column; }
+    .browserbar{ position:static; flex:none; }
+    .seite-aussen{ padding:0; flex:1; min-height:0; display:flex; flex-direction:column; }
+    .seite{ flex:1; min-height:0; display:flex; flex-direction:column; }
+    .plattform-nav{ display:none; }
+    .plattform-rahmen{ width:100%; flex:1; min-height:0; display:flex; flex-direction:column; }
+    .plattform-inhalt{ width:100% !important; flex:1; min-height:0; display:flex; flex-direction:column; }
+    .karte{ border-radius:0; flex:none; }
+    .titelbild{ border-radius:0; }
+    .fotos-bereich{ border-radius:0; margin-top:0; padding:14px 10px; flex:1; min-height:0;
+                     overflow-y:auto; -webkit-overflow-scrolling:touch; }
+    .raster-panel{ width:100%; padding:6px; }
+    .raster{ grid-template-columns:repeat(2, 1fr); }
+    .werkzeuge{ display:none; }
+    .zelle-bearbeiten{ display:none; }
+    .werkzeuge-toggle{ display:none; }
+    .browserbar{ gap:8px; padding:0 8px; }
+    .urlbar{ min-width:0; padding:0 6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11.5px; }
+    .navicons{ gap:9px; }
+    .navicons svg{ width:15px; height:15px; }
+  }
+
+  @media print{
+    body{ padding:0; }
+    .seite-aussen{ padding:0; }
+    .browserbar{ display:none; }
+    .werkzeuge{ display:none; }
+    .werkzeuge-toggle{ display:none; }
+  }
+
+  /* ---------------- Uebersicht (Trippel-Klick auf Menue-Icon) ----------------
+     Legende fuer die getarnten Icons + Foto-Zuweisung fuer alle Bilder,
+     nach dem Vorbild von Daniels Szenenauswahl. */
+  .uebersicht{
+    display:none; position:fixed; inset:0; z-index:100; background:#12141a; color:#e9ecf6;
+    flex-direction:column; align-items:center; padding:30px 16px 50px; overflow:auto;
+  }
+  .uebersicht.offen{ display:flex; }
+  .uebersicht h1{ font-size:22px; margin:0 0 4px; }
+  .uebersicht > p{ color:#9aa0bd; font-size:14px; margin:0 0 22px; text-align:center; }
+  .legende{ width:100%; max-width:520px; margin-bottom:26px; }
+  .legende-zeile{ display:flex; align-items:center; gap:12px; padding:9px 0;
+                   border-bottom:1px solid #262a36; }
+  .legende-zeile .icon{ width:30px; height:30px; border-radius:8px; background:#1d2029;
+                         display:flex; align-items:center; justify-content:center; flex:none; }
+  .legende-zeile .icon svg{ width:16px; height:16px; fill:none; stroke:#e9ecf6; stroke-width:1.8;
+                             stroke-linecap:round; stroke-linejoin:round; }
+  .legende-zeile .text{ font-size:13.5px; line-height:1.4; }
+  .legende-zeile .text b{ color:#fff; }
+  .uebersicht-regler{ width:100%; max-width:520px; display:flex; align-items:center; gap:10px;
+                       margin-bottom:24px; font-size:13.5px; }
+  .uebersicht-regler input{ flex:1; }
+  .uebersicht-knoepfe{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:30px; }
+  .fotoliste{ width:100%; max-width:520px; }
+  .fotoliste-titel{ font-size:14px; font-weight:600; margin-bottom:10px; text-align:center; opacity:.9; }
+  .fotozeile{ display:flex; align-items:center; gap:12px; background:#1a1c24; border:1px solid #282c36;
+              border-radius:10px; padding:8px 12px; margin-bottom:7px; }
+  .fotozeile .was{ flex:1; min-width:0; font-size:13.5px; }
+  .fotozeile .was small{ display:block; color:#787f8a; font-size:11.5px; margin-top:1px; }
+  .fotozeile .vorschau{ width:34px; height:34px; border-radius:6px; object-fit:cover; flex:none; }
+  .fotozeile-btn{ cursor:pointer; flex:none; background:#2f6b8f; color:#fff; font-size:12.5px;
+                   font-weight:600; padding:7px 12px; border-radius:16px; white-space:nowrap; border:0; }
+  .fotozeile-btn:hover{ background:#387ea8; }
+  .uebersicht-schliessen{ position:fixed; right:16px; top:16px; width:36px; height:36px;
+                           border-radius:50%; border:0; background:rgba(255,255,255,.1); color:#fff;
+                           cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .uebersicht-schliessen svg{ width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2;
+                               stroke-linecap:round; stroke-linejoin:round; }
+  /* ===== Export-Overlay ===== */
+  #expLade{ position:fixed; inset:0; z-index:140; display:none;
+            align-items:center; justify-content:center; background:rgba(8,10,14,.85);
+            color:#e8eaee; font-size:15px;
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  body.explaeuft #expLade{ display:flex; }
+  #expBox{ position:fixed; inset:0; z-index:150; display:none; overflow-y:auto;
+           background:rgba(8,10,14,.96);
+           padding:calc(env(safe-area-inset-top) + 18px) 16px calc(env(safe-area-inset-bottom) + 24px); }
+  body.expoffen #expBox{ display:block; }
+  #expBox .innen{ max-width:520px; margin:0 auto; color:#e8eaee; text-align:center;
+                  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  #expBox h2{ font-size:17px; margin:0 0 4px; }
+  #expBox .masse{ color:#9aa1ad; font-size:13px; margin:0 0 14px; line-height:1.5; word-break:break-all; }
+  #expVorschau{ display:block; width:100%; max-width:280px; margin:0 auto 14px;
+                border-radius:10px; border:1px solid #2a2f3a; background:#000; }
+  #expBox .reihe{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  #expBox .knopf{ font:inherit; font-size:15px; padding:11px 18px; border-radius:10px;
+                  border:1px solid #3a4150; background:#20242e; color:#e8eaee;
+                  cursor:pointer; text-decoration:none; }
+  #expBox .knopf.fertig{ background:#2f6b8f; border-color:#2f6b8f; }
+</style>
+</head>
+<body>
+
+<div class="browserbar">
+  <div class="menue" id="menue" title="Menü">
+    <svg viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="19" fill="#2b2b2b"/>
+      <rect x="9.5" y="10.5" width="21" height="5" rx="2.5" fill="#dd2b21"/>
+      <rect x="9.5" y="17.5" width="21" height="5" rx="2.5" fill="#f2e42d"/>
+      <rect x="9.5" y="24.5" width="21" height="5" rx="2.5" fill="#52b83a"/>
+    </svg>
+  </div>
+  <div class="urlbar">https://clararoithamer.social/profil</div>
+  <div class="navicons">
+    <span class="aus" title="Zurück">&#8592;</span>
+    <span id="btnNeu" title="Neu laden">&#10227;</span>
+    <span id="btnVollbild" title="Neuer Beitrag">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    </span>
+    <span id="btnGroesse" title="Anzeige">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h16"/><circle cx="18" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+    </span>
+    <span id="btnOrdnerIcon" title="Medien">
+      <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    </span>
+    <span id="btnResetIcon" title="Konto">
+      <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+    </span>
+    <span id="btnExportIcon" title="Teilen">
+      <svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7-7-1z"/></svg>
+    </span>
+  </div>
+</div>
+
+<div class="seite-aussen">
+<div class="seite" id="seite">
+  <div class="plattform-rahmen">
+    <div class="plattform-nav">
+      <div class="nav-icon aktiv"><svg viewBox="0 0 24 24"><rect x="3" y="10" width="18" height="11" rx="1"/><path d="M3 10l9-6 9 6"/></svg></div>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9v6h-6"/></svg></div>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 21c-4-3-8-6.5-8-11a5 5 0 0 1 8-4 5 5 0 0 1 8 4c0 4.5-4 8-8 11z"/></svg></div>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg></div>
+      <div class="nav-trenner"></div>
+      <div class="nav-avatar"></div>
+    </div>
+    <div class="plattform-inhalt">
+      <div class="karte">
+        <div class="titelbild-wrap">
+          <div class="titelbild" data-ziel="titelbild"><img data-medium="titelbild" alt=""></div>
+          <div class="avatar-rahmen" id="avatarRahmen" data-ziel="profil">
+            <img data-medium="profil" alt="">
+          </div>
+        </div>
+
+        <div class="kopfzeile">
+          <div class="kopf-info" id="kopfInfo">
+            <div class="name">Clara Roithamer</div>
+            <div class="handle">@clara.roithamer</div>
+            <div class="stats">
+              <div class="stat"><span class="zahl">361</span><span class="label">Beiträge</span></div>
+              <div class="stat"><span class="zahl">3.482</span><span class="label">Follower</span></div>
+              <div class="stat"><span class="zahl">516</span><span class="label">Gefolgt</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bio-zeile"><span class="beruf">Producerin</span> · Live-TV &amp; Events<br>Immer hinter den Kulissen 🎬</div>
+        <hr class="trenner">
+      </div>
+
+      <div class="fotos-bereich">
+        <div class="raster-panel">
+          <div class="raster" id="raster"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="werkzeuge">
+  <div class="gruppe">
+    Profilbild
+    <input type="range" id="avatarGroesse" min="60" max="450" step="2" value="132">
+  </div>
+  <div class="werkzeuge-trenner"></div>
+  <button class="werkzeugbtn" id="btnOrdner">Ordner wählen</button>
+  <button class="werkzeugbtn" id="btnReset">Zurücksetzen</button>
+  <button class="werkzeugbtn" id="btnExport">Als Bild speichern</button>
+</div>
+
+<button class="werkzeuge-toggle" id="btnWerkzeugeToggle" title="Werkzeugleiste ein-/ausblenden">
+  <svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.6 21.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+</button>
+
+<input type="file" id="ordnerEingabe" webkitdirectory directory multiple style="position:fixed;width:0;height:0;overflow:hidden;">
+
+<div class="uebersicht" id="uebersicht">
+  <button class="uebersicht-schliessen" id="uebersichtSchliessen">
+    <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <h1>Übersicht</h1>
+  <p>Was die getarnten Symbole in der Adressleiste wirklich tun</p>
+
+  <div class="legende">
+    <div class="legende-zeile">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div class="text"><b>"+"</b> — Vollbild ein-/ausschalten (Taste F)</div>
+    </div>
+    <div class="legende-zeile">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h16"/></svg></div>
+      <div class="text"><b>Linien-Symbol</b> — Profilbild-Größe (springt durch ein paar feste Größen)</div>
+    </div>
+    <div class="legende-zeile">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+      <div class="text"><b>Ordner-Symbol</b> — einen ganzen Ordner mit Fotos auswählen</div>
+    </div>
+    <div class="legende-zeile">
+      <div class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+      <div class="text"><b>Schloss-Symbol</b> — alle Fotos/Einstellungen zurücksetzen</div>
+    </div>
+    <div class="legende-zeile">
+      <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7-7-1z"/></svg></div>
+      <div class="text"><b>Teilen-Symbol</b> — aktuelle Seite als PNG-Bild speichern</div>
+    </div>
+    <div class="legende-zeile" style="border-bottom:none;">
+      <div class="icon"><svg viewBox="0 0 24 24"><circle cx="20" cy="20" r="19"/></svg></div>
+      <div class="text"><b>Menü-Icon links</b> — dreimal antippen öffnet diese Übersicht wieder</div>
+    </div>
+  </div>
+
+  <div class="uebersicht-regler">
+    Profilbild-Größe (fein)
+    <input type="range" id="avatarGroesseFein" min="60" max="450" step="2" value="132">
+  </div>
+
+  <div class="uebersicht-knoepfe">
+    <button class="werkzeugbtn" id="btnOrdnerUebersicht">Ordner wählen</button>
+    <button class="werkzeugbtn" id="btnResetUebersicht">Zurücksetzen</button>
+    <button class="werkzeugbtn" id="btnExportUebersicht">Als Bild speichern</button>
+  </div>
+
+  <div class="fotoliste">
+    <div class="fotoliste-titel">Einzelne Fotos zuweisen</div>
+    <div id="fotolisteInhalt"></div>
+  </div>
+</div>
+
+<div class="post-overlay" id="postOverlay">
+  <div class="post-leiste">
+    <button class="post-schliessen" id="postSchliessen">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+  </div>
+  <div class="post-inhalt">
+    <div class="post-bild"><img id="postBild" alt=""></div>
+    <div class="post-details">
+      <div class="post-kopf">
+        <div class="post-avatar"><img id="postAvatar" alt=""></div>
+        <div>
+          <div class="post-name">Clara Roithamer</div>
+          <div class="post-zeit">vor 3 Std.</div>
+        </div>
+      </div>
+      <div class="post-aktionen">
+        <div class="post-icon"><svg viewBox="0 0 24 24"><path d="M12 21c-4-3-8-6.5-8-11a5 5 0 0 1 8-4 5 5 0 0 1 8 4c0 4.5-4 8-8 11z"/></svg></div>
+        <div class="post-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="post-icon"><svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7-7-1z"/></svg></div>
+        <div class="post-icon rechts"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></div>
+      </div>
+      <div class="post-likes">128 Reaktionen</div>
+      <div class="post-caption"><b>clara.roithamer</b> <span id="postCaption"></span></div>
+      <div class="post-kommentare" id="postKommentare">
+        <div class="kommentar"><b>Melli_Bacher</b> Oida ist bei euch eh alles ok?? Hab grad was gehört 😟</div>
+        <div class="kommentar"><b>sandra.huber88</b> Was ist da passiert?? Man hört nur Gerüchte, hoffe es geht allen gut!</div>
+        <div class="kommentar"><b>tom_zauner91</b> Bitte meldet euch, macht euch grad große Sorgen alle 🙏</div>
+      </div>
+      <div class="post-kommentar-eingabe">
+        <div class="mini-avatar"></div>
+        <input type="text" placeholder="Kommentar hinzufügen …" disabled>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="dateiEingaben"></div>
+
+<div id="expLade">Bild wird erzeugt &hellip;</div>
+<div id="expBox">
+  <div class="innen">
+    <h2>Bild erzeugt</h2>
+    <p class="masse" id="expMasse"></p>
+    <img id="expVorschau" alt="">
+    <div class="reihe">
+      <a class="knopf fertig" id="expLaden" download>Herunterladen</a>
+      <button class="knopf" id="expZu">Schließen</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ============================================================================
+   1. MEDIEN-REGISTER + RASTER AUFBAUEN
+   ========================================================================== */
+const MEDIEN = {
+  titelbild: { datei:"Titelbild_Clara.jpg", w:1600, h:667,
+               label:"Titelbild_Clara.jpg — Titelbild, frei wählbar" },
+  profil: { datei:"Profilbild_Clara_Baum.jpg", w:600, h:600,
+            label:"Profilbild_Clara_Baum.jpg — Clara am Baum, See im Hintergrund" },
+  post1:  { datei:"Foto_Sessel_Podium.jpg", w:600, h:600,
+            label:"Foto_Sessel_Podium.jpg — WICHTIG: Lounge-Sessel, vgl. 6918" }
+};
+for(let i = 2; i <= 20; i++){
+  MEDIEN["post" + i] = { datei:"Post_" + i + ".jpg", w:600, h:600, label:"Post_" + i + ".jpg" };
+}
+const ENDUNGEN = ["jpg","jpeg","JPG","JPEG","png","PNG","webp"];
+const MANUELL = {};
+
+const raster = document.getElementById("raster");
+const eingaben = document.getElementById("dateiEingaben");
+for(let i = 1; i <= 20; i++){
+  const ziel = "post" + i;
+  const zelle = document.createElement("div");
+  zelle.className = "zelle";
+  zelle.setAttribute("data-ziel", ziel);
+  const img = document.createElement("img");
+  img.setAttribute("data-medium", ziel);
+  img.alt = "";
+  zelle.appendChild(img);
+  const bearbeiten = document.createElement("div");
+  bearbeiten.className = "zelle-bearbeiten";
+  bearbeiten.title = "Datei wählen";
+  bearbeiten.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+  zelle.appendChild(bearbeiten);
+  raster.appendChild(zelle);
+}
+Object.keys(MEDIEN).forEach(ziel => {
+  const feld = document.createElement("input");
+  feld.type = "file"; feld.accept = "image/*"; feld.setAttribute("data-ziel", ziel);
+  eingaben.appendChild(feld);
+});
+
+/* ============================================================================
+   2. GREENSCREEN / DATEISUCHE / SPEICHERN (gleiches Prinzip wie in den
+      anderen Prop-Dateien)
+   ========================================================================== */
+function marker(x,y,s){
+  return '<g stroke="#101010" stroke-width="'+(2.4*s)+'" fill="none">' +
+         '<line x1="'+(x-11*s)+'" y1="'+y+'" x2="'+(x+11*s)+'" y2="'+y+'"/>' +
+         '<line x1="'+x+'" y1="'+(y-11*s)+'" x2="'+x+'" y2="'+(y+11*s)+'"/>' +
+         '<circle cx="'+x+'" cy="'+y+'" r="'+(6*s)+'"/></g>' +
+         '<circle cx="'+x+'" cy="'+y+'" r="'+(2.2*s)+'" fill="#101010"/>';
+}
+function greenscreen(w,h,text){
+  const s = Math.max(w,h)/640;
+  let g = "";
+  for(let ix=1; ix<=3; ix++) for(let iy=1; iy<=3; iy++) g += marker(w*ix/4, h*iy/4, s);
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">' +
+    '<rect width="'+w+'" height="'+h+'" fill="#00b140"/>' + g +
+    '<text x="'+(w/2)+'" y="'+(h-14*s)+'" text-anchor="middle" fill="#0d3f1c" ' +
+    'font-family="Helvetica,Arial" font-size="'+(13*s)+'">' + text + '</text></svg>');
+}
+function dateiSuchen(ziel, gefunden){
+  const m = MEDIEN[ziel];
+  const stamm = m.datei.replace(/\.[^.]+$/, "");
+  let liste = [m.datei];
+  ENDUNGEN.forEach(e => liste.push(stamm + "." + e));
+  liste = liste.filter((v,i,a) => a.indexOf(v) === i);
+  (function versuch(i){
+    if(i >= liste.length){ if(MANUELL[ziel]) gefunden(MANUELL[ziel]); return; }
+    const test = new Image();
+    test.onload  = () => gefunden(liste[i]);
+    test.onerror = () => versuch(i+1);
+    test.src = liste[i];
+  })(0);
+}
+function medienSetzen(){
+  Object.keys(MEDIEN).forEach(ziel => {
+    const m = MEDIEN[ziel];
+    const img = document.querySelector('img[data-medium="'+ziel+'"]');
+    img.src = greenscreen(m.w, m.h, m.label);
+    dateiSuchen(ziel, url => { img.src = url; });
+  });
+}
+medienSetzen();
+
+document.querySelectorAll('[data-ziel]:not(.zelle)').forEach(el => {
+  if(el.tagName === "INPUT") return;
+  let wartend = null;
+  el.addEventListener("click", () => {
+    if(geradeVerschoben){ geradeVerschoben = false; return; }
+    const ziel = el.getAttribute("data-ziel");
+    const oeffnen = () => document.querySelector('#dateiEingaben input[data-ziel="'+ziel+'"]').click();
+    if(window.innerWidth <= 480){
+      if(wartend){ clearTimeout(wartend); wartend = null; oeffnen(); }
+      else { wartend = setTimeout(() => { wartend = null; }, 300); }
+    } else {
+      oeffnen();
+    }
+  });
+});
+
+document.querySelectorAll(".zelle-bearbeiten").forEach(btn => {
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const ziel = btn.closest(".zelle").getAttribute("data-ziel");
+    document.querySelector('#dateiEingaben input[data-ziel="'+ziel+'"]').click();
+  });
+});
+
+/* ============================================================================
+   1b. BILD IM RAHMEN VERSCHIEBEN (Zuschnitt anpassen)
+   Gilt fuer alle Bilder (Profil, Titelbild, Raster) - nur am groesseren
+   Bildschirm (nicht am Handy, dort ist es reine Anzeige/Aufnahme).
+   ========================================================================== */
+let geradeVerschoben = false;
+function machVerschiebbar(img){
+  const ziel = img.getAttribute("data-medium");
+  let posX = 50, posY = 50, ziehend = false, bewegt = false, startX, startY, startPosX, startPosY;
+
+  try{
+    const gemerkt = localStorage.getItem("clara_pos_" + ziel);
+    if(gemerkt){ const p = JSON.parse(gemerkt); posX = p.x; posY = p.y; }
+  } catch(e){ /* egal */ }
+  img.style.objectPosition = posX + "% " + posY + "%";
+  img.style.cursor = "grab";
+
+  function beginn(x, y){
+    if(window.innerWidth <= 480) return;
+    ziehend = true; bewegt = false;
+    startX = x; startY = y; startPosX = posX; startPosY = posY;
+    img.style.cursor = "grabbing";
+  }
+  function bewegen(x, y){
+    if(!ziehend) return;
+    const rect = img.getBoundingClientRect();
+    const dx = x - startX, dy = y - startY;
+    if(Math.abs(dx) > 3 || Math.abs(dy) > 3) bewegt = true;
+    posX = Math.min(100, Math.max(0, startPosX - (dx / rect.width) * 100));
+    posY = Math.min(100, Math.max(0, startPosY - (dy / rect.height) * 100));
+    img.style.objectPosition = posX + "% " + posY + "%";
+  }
+  function ende(){
+    if(!ziehend) return;
+    ziehend = false;
+    img.style.cursor = "grab";
+    if(bewegt){
+      geradeVerschoben = true;
+      try{ localStorage.setItem("clara_pos_" + ziel, JSON.stringify({x:posX, y:posY})); } catch(e){ /* egal */ }
+    }
+  }
+  img.addEventListener("mousedown", e => { e.preventDefault(); beginn(e.clientX, e.clientY); });
+  window.addEventListener("mousemove", e => bewegen(e.clientX, e.clientY));
+  window.addEventListener("mouseup", ende);
+  img.addEventListener("touchstart", e => { const t = e.touches[0]; beginn(t.clientX, t.clientY); }, {passive:true});
+  img.addEventListener("touchmove", e => { const t = e.touches[0]; bewegen(t.clientX, t.clientY); }, {passive:true});
+  img.addEventListener("touchend", ende);
+
+  img.zuschnittZuruecksetzen = function(){
+    posX = 50; posY = 50;
+    img.style.objectPosition = "50% 50%";
+    try{ localStorage.removeItem("clara_pos_" + ziel); } catch(e){ /* egal */ }
+  };
+}
+document.querySelectorAll("[data-medium]").forEach(machVerschiebbar);
+
+/* ============================================================================
+   2a. POST-DETAILANSICHT (Antippen eines Rasterbilds)
+   ========================================================================== */
+const BESCHREIBUNGEN = {
+  post1: "Gleich startet die Live-Podcast Aufzeichnung von „Linz bei Nacht\"! 🎙️"
+};
+const postOverlay = document.getElementById("postOverlay");
+function postOeffnen(ziel){
+  const bild = document.querySelector('.zelle[data-ziel="'+ziel+'"] img');
+  document.getElementById("postBild").src = bild.src;
+  document.getElementById("postAvatar").src = document.querySelector('img[data-medium="profil"]').src;
+  document.getElementById("postCaption").textContent =
+    BESCHREIBUNGEN[ziel] || "Schöner Moment, den ich festhalten wollte. 📸";
+  postOverlay.classList.add("offen");
+}
+document.querySelectorAll(".zelle").forEach(zelle => {
+  let wartend = null;
+  zelle.addEventListener("click", e => {
+    if(e.target.closest(".zelle-bearbeiten")) return;
+    if(geradeVerschoben){ geradeVerschoben = false; return; }
+    const ziel = zelle.getAttribute("data-ziel");
+    if(window.innerWidth <= 480){
+      if(wartend){
+        clearTimeout(wartend); wartend = null;
+        document.querySelector('#dateiEingaben input[data-ziel="'+ziel+'"]').click();
+      } else {
+        wartend = setTimeout(() => { wartend = null; postOeffnen(ziel); }, 300);
+      }
+    } else {
+      postOeffnen(ziel);
+    }
+  });
+});
+document.getElementById("postSchliessen").addEventListener("click", () => {
+  postOverlay.classList.remove("offen");
+});
+
+function verkleinern(datenUrl, fertig){
+  const img = new Image();
+  img.onload = () => {
+    const max = 1400;
+    let w = img.naturalWidth, h = img.naturalHeight;
+    if(Math.max(w,h) > max){ const f = max/Math.max(w,h); w = Math.round(w*f); h = Math.round(h*f); }
+    try{
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      c.getContext("2d").drawImage(img, 0, 0, w, h);
+      fertig(c.toDataURL("image/jpeg", 0.9));
+    } catch(e){ fertig(datenUrl); }
+  };
+  img.onerror = () => fertig(datenUrl);
+  img.src = datenUrl;
+}
+document.querySelectorAll('#dateiEingaben input[type=file]').forEach(feld => {
+  feld.addEventListener("change", () => {
+    const ziel = feld.getAttribute("data-ziel");
+    const datei = feld.files && feld.files[0];
+    if(!datei) return;
+    const leser = new FileReader();
+    leser.onload = () => verkleinern(leser.result, klein => {
+      MANUELL[ziel] = klein;
+      try{ localStorage.setItem("clara_"+ziel, klein); } catch(e){ /* egal */ }
+      const img = document.querySelector('img[data-medium="'+ziel+'"]');
+      img.src = klein;
+      if(img.zuschnittZuruecksetzen) img.zuschnittZuruecksetzen();
+    });
+    leser.readAsDataURL(datei);
+  });
+});
+Object.keys(MEDIEN).forEach(ziel => {
+  try{
+    const gemerkt = localStorage.getItem("clara_"+ziel);
+    if(gemerkt){ MANUELL[ziel] = gemerkt; document.querySelector('img[data-medium="'+ziel+'"]').src = gemerkt; }
+  } catch(e){ /* egal */ }
+});
+document.getElementById("btnReset").addEventListener("click", () => {
+  Object.keys(MEDIEN).forEach(ziel => {
+    delete MANUELL[ziel];
+    try{
+      localStorage.removeItem("clara_"+ziel);
+      localStorage.removeItem("clara_pos_"+ziel);
+    } catch(e){ /* egal */ }
+    const img = document.querySelector('img[data-medium="'+ziel+'"]');
+    if(img && img.zuschnittZuruecksetzen) img.zuschnittZuruecksetzen();
+  });
+  medienSetzen();
+});
+
+/* ============================================================================
+   2c. EINEN ORDNER MIT ALLEN FOTOS AUSWAEHLEN
+   Sucht darin selbststaendig anhand der erwarteten Dateinamen (siehe MEDIEN)
+   die passenden Fotos und ordnet sie automatisch zu. Einzelne Bilder lassen
+   sich danach ueber den Stift trotzdem noch manuell austauschen.
+   ========================================================================== */
+document.getElementById("btnOrdner").addEventListener("click", () => {
+  document.getElementById("ordnerEingabe").click();
+});
+document.getElementById("ordnerEingabe").addEventListener("change", function(){
+  const dateien = Array.from(this.files || []).filter(d => /^image\//.test(d.type));
+  if(!dateien.length) return;
+
+  function stammVon(name){
+    return name.replace(/\.[^.]+$/, "").toLowerCase();
+  }
+  const gefundeneZiele = [];
+
+  Object.keys(MEDIEN).forEach(ziel => {
+    const erwarteterStamm = stammVon(MEDIEN[ziel].datei);
+    const treffer = dateien.find(d => stammVon(d.name) === erwarteterStamm);
+    if(!treffer) return;
+    const leser = new FileReader();
+    leser.onload = () => verkleinern(leser.result, klein => {
+      MANUELL[ziel] = klein;
+      try{ localStorage.setItem("clara_"+ziel, klein); } catch(e){ /* egal */ }
+      const img = document.querySelector('img[data-medium="'+ziel+'"]');
+      img.src = klein;
+      if(img.zuschnittZuruecksetzen) img.zuschnittZuruecksetzen();
+    });
+    leser.readAsDataURL(treffer);
+    gefundeneZiele.push(ziel);
+  });
+
+  this.value = "";
+  setTimeout(() => {
+    alert(gefundeneZiele.length
+      ? gefundeneZiele.length + " von " + Object.keys(MEDIEN).length + " Fotos im Ordner gefunden und eingesetzt. " +
+        "Fehlende oder falsche Fotos können über den Stift bei jedem Bild einzeln nachgetragen werden."
+      : "Im gewählten Ordner wurden keine passend benannten Fotos gefunden. Dateinamen bitte mit denen in der Szenenbeschreibung oben in der HTML-Datei abgleichen.");
+  }, 300);
+});
+
+/* ============================================================================
+   2b. PROFILBILD-GRÖSSE (ragt beim Vergrößern ins Titelbild hinein)
+   ========================================================================== */
+(function(){
+  const regler = document.getElementById("avatarGroesse");
+  const rahmen = document.getElementById("avatarRahmen");
+  const bio = document.querySelector(".bio-zeile");
+  const kopfInfo = document.getElementById("kopfInfo");
+  function anwenden(px){
+    px = parseInt(px, 10);
+    rahmen.style.width = px + "px";
+    rahmen.style.height = px + "px";
+    rahmen.style.transform = "translateY(-" + Math.round(px * 0.4) + "px)";
+    bio.style.marginLeft = (px + 18) + "px";
+    kopfInfo.style.marginLeft = (px + 18) + "px";
+  }
+  let start = 132;
+  try{
+    const gemerkt = localStorage.getItem("clara_avatar_groesse");
+    if(gemerkt) start = parseInt(gemerkt, 10);
+  } catch(e){ /* egal */ }
+  regler.value = start;
+  anwenden(start);
+  const feinregler = document.getElementById("avatarGroesseFein");
+  feinregler.value = start;
+  regler.addEventListener("input", () => {
+    anwenden(regler.value);
+    feinregler.value = regler.value;
+    try{ localStorage.setItem("clara_avatar_groesse", regler.value); } catch(e){ /* egal */ }
+  });
+  feinregler.addEventListener("input", () => {
+    regler.value = feinregler.value;
+    anwenden(feinregler.value);
+    try{ localStorage.setItem("clara_avatar_groesse", feinregler.value); } catch(e){ /* egal */ }
+  });
+
+  /* Getarntes Icon in der Browserleiste: zyklisch durch ein paar feste
+     Groessen schalten (Feinregler bleibt in der Uebersicht verfuegbar). */
+  const PRESETS = [90, 140, 200, 280];
+  document.getElementById("btnGroesse").addEventListener("click", () => {
+    const aktuell = parseInt(regler.value, 10);
+    let naechsterIndex = PRESETS.findIndex(p => p > aktuell);
+    if(naechsterIndex === -1) naechsterIndex = 0;
+    const neu = PRESETS[naechsterIndex];
+    regler.value = neu;
+    feinregler.value = neu;
+    anwenden(neu);
+    try{ localStorage.setItem("clara_avatar_groesse", neu); } catch(e){ /* egal */ }
+  });
+})();
+
+/* ============================================================================
+   3. ALS BILD SPEICHERN
+   ========================================================================== */
+document.getElementById("btnExport").addEventListener("click", () => {
+  document.body.classList.add("explaeuft");
+  const quelle = document.getElementById("seite");
+  const rect = quelle.getBoundingClientRect();
+  const klon = quelle.cloneNode(true);
+
+  const bilder = klon.querySelectorAll("img");
+  let offen = bilder.length;
+  const weiter = () => { if(--offen === 0) rendern(); };
+  if(!offen) rendern();
+  bilder.forEach(b => {
+    const src = b.getAttribute("src") || "";
+    if(src.indexOf("data:") === 0){ weiter(); return; }
+    const q = new Image();
+    q.onload = () => {
+      try{
+        const c = document.createElement("canvas");
+        c.width = q.naturalWidth; c.height = q.naturalHeight;
+        c.getContext("2d").drawImage(q, 0, 0);
+        b.setAttribute("src", c.toDataURL("image/jpeg", 0.9));
+      } catch(e){ /* egal */ }
+      weiter();
+    };
+    q.onerror = weiter;
+    q.src = src;
+  });
+
+  function rendern(){
+    const W = Math.round(rect.width), H = Math.round(rect.height);
+    let inhalt;
+    try{
+      klon.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+      inhalt = new XMLSerializer().serializeToString(klon);
+    } catch(e){ document.body.classList.remove("explaeuft"); alert("Bild konnte nicht erzeugt werden."); return; }
+
+    let css = "";
+    document.querySelectorAll("style").forEach(s => css += s.textContent + "\n");
+
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">' +
+      '<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">' +
+      '<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+W+'px;">' +
+      '<style>' + css + '</style>' + inhalt +
+      '</div></foreignObject></svg>';
+
+    const img = new Image();
+    img.onload = () => {
+      const k = 2; /* fuer schaerferen Ausdruck */
+      const c = document.createElement("canvas");
+      c.width = W*k; c.height = H*k;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#f4f4f6"; ctx.fillRect(0,0,c.width,c.height);
+      ctx.drawImage(img, 0, 0, W*k, H*k);
+      c.toBlob(b => {
+        const url = URL.createObjectURL(b);
+        document.getElementById("expVorschau").src = url;
+        const a = document.getElementById("expLaden");
+        a.href = url; a.setAttribute("download", "Clara_Roithamer_Profil.png");
+        document.getElementById("expMasse").textContent = (W*k) + " × " + (H*k) + " px · " + Math.round(b.size/1024) + " KB";
+        document.body.classList.remove("explaeuft");
+        document.body.classList.add("expoffen");
+      }, "image/png");
+    };
+    img.onerror = () => { document.body.classList.remove("explaeuft"); alert("Bild konnte nicht erzeugt werden."); };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+});
+document.getElementById("expZu").addEventListener("click", () => {
+  document.body.classList.remove("expoffen");
+  const v = document.getElementById("expVorschau");
+  if(v.src.indexOf("blob:") === 0) URL.revokeObjectURL(v.src);
+});
+
+/* ============================================================================
+   5. WERKZEUGLEISTE EIN-/AUSBLENDEN (verraet sonst die Bearbeitung)
+   ========================================================================== */
+(function(){
+  const panel = document.querySelector(".werkzeuge");
+  const knopf = document.getElementById("btnWerkzeugeToggle");
+  let versteckt = false;
+  try{ versteckt = localStorage.getItem("clara_werkzeuge_versteckt") === "1"; } catch(e){ /* egal */ }
+  function anwenden(){
+    panel.classList.toggle("versteckt", versteckt);
+  }
+  anwenden();
+  knopf.addEventListener("click", () => {
+    versteckt = !versteckt;
+    anwenden();
+    try{ localStorage.setItem("clara_werkzeuge_versteckt", versteckt ? "1" : "0"); } catch(e){ /* egal */ }
+  });
+})();
+
+/* ============================================================================
+   4. VOLLBILD (wie in den anderen Prop-Dateien)
+   ========================================================================== */
+function vollbildUmschalten(){
+  const d = document, e = d.documentElement;
+  const drin = d.fullscreenElement || d.webkitFullscreenElement;
+  if(drin){ (d.exitFullscreen || d.webkitExitFullscreen).call(d); }
+  else    { (e.requestFullscreen || e.webkitRequestFullscreen || (()=>{})).call(e); }
+}
+document.getElementById("btnVollbild").addEventListener("click", vollbildUmschalten);
+document.getElementById("btnNeu").addEventListener("click", () => location.reload());
+document.getElementById("btnOrdnerIcon").addEventListener("click", () => document.getElementById("btnOrdner").click());
+document.getElementById("btnResetIcon").addEventListener("click", () => document.getElementById("btnReset").click());
+document.getElementById("btnExportIcon").addEventListener("click", () => document.getElementById("btnExport").click());
+document.addEventListener("keydown", e => {
+  if(e.target.tagName === "INPUT") return;
+  if(e.key === "f" || e.key === "F") vollbildUmschalten();
+});
+function vollbildPruefen(){
+  const drin = document.fullscreenElement || document.webkitFullscreenElement
+               || window.navigator.standalone === true;
+  document.body.classList.toggle("imvollbild", !!drin);
+}
+document.addEventListener("fullscreenchange", vollbildPruefen);
+document.addEventListener("webkitfullscreenchange", vollbildPruefen);
+vollbildPruefen();
+
+/* ============================================================================
+   6. UEBERSICHT (Legende + Fotozuweisung) - dreimal auf das Menue-Icon tippen
+   ========================================================================== */
+(function(){
+  const overlay = document.getElementById("uebersicht");
+  function zeigen(){ overlay.classList.add("offen"); }
+  function schliessen(){ overlay.classList.remove("offen"); }
+
+  let n = 0, t = 0;
+  document.getElementById("menue").addEventListener("click", () => {
+    const jetzt = new Date().getTime();
+    n = (jetzt - t < 800) ? n + 1 : 1; t = jetzt;
+    if(n >= 3){ n = 0; zeigen(); }
+  });
+  document.getElementById("uebersichtSchliessen").addEventListener("click", schliessen);
+
+  document.getElementById("btnOrdnerUebersicht").addEventListener("click", () => document.getElementById("btnOrdner").click());
+  document.getElementById("btnResetUebersicht").addEventListener("click", () => document.getElementById("btnReset").click());
+  document.getElementById("btnExportUebersicht").addEventListener("click", () => document.getElementById("btnExport").click());
+
+  /* Fotoliste automatisch aus dem MEDIEN-Register aufbauen */
+  const NAMEN = {
+    titelbild: "Titelbild",
+    profil: "Profilbild (Baum am Attersee)",
+    post1: "Rasterfoto 1 — Lounge-Sessel (wichtig, vgl. 6918)"
+  };
+  const inhalt = document.getElementById("fotolisteInhalt");
+  Object.keys(MEDIEN).forEach(ziel => {
+    const name = NAMEN[ziel] || ("Rasterfoto " + ziel.replace("post",""));
+    const zeile = document.createElement("div");
+    zeile.className = "fotozeile";
+    zeile.innerHTML =
+      '<img class="vorschau" alt="">' +
+      '<div class="was">' + name + '<small>' + MEDIEN[ziel].datei + '</small></div>' +
+      '<button class="fotozeile-btn">Datei wählen</button>';
+    zeile.querySelector(".vorschau").src = document.querySelector('img[data-medium="'+ziel+'"]').src;
+    zeile.querySelector("button").addEventListener("click", () => {
+      document.querySelector('#dateiEingaben input[data-ziel="'+ziel+'"]').click();
+    });
+    inhalt.appendChild(zeile);
+
+    const beobachter = new MutationObserver(() => {
+      zeile.querySelector(".vorschau").src = document.querySelector('img[data-medium="'+ziel+'"]').src;
+    });
+    beobachter.observe(document.querySelector('img[data-medium="'+ziel+'"]'), { attributes:true, attributeFilter:["src"] });
+  });
+})();
+</script>
+</body>
+</html>

@@ -277,7 +277,7 @@
   @media (max-width:820px), (orientation:portrait) and (max-width:1100px){
     .topbar{ display:none; }
     .vollbild{ display:flex; }
-    .leseansicht{ padding:10px; }
+    .leseansicht{ padding:calc(env(safe-area-inset-top) + 26px) 16px 30px; }
     .mail{ padding:20px 18px 50px; }
     .betreff{ font-size:19px; }
     .text p, .signatur{ font-size:15.5px; }
